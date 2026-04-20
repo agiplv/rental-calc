@@ -1,75 +1,18 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
-<head>
-    <!-- Eruda для мобильной отладки -->
-    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
-  <meta name="theme-color" content="#0f172a" />
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="PEA Rental Calc">
-  <link rel="manifest" href="./manifest.json" />
-  <link rel="apple-touch-icon" href="icon-192.png">
-  <title>PEA Rental Calc</title>
-  <!-- Material Web Components (ESM imports) -->
-  <script type="module">
-    import 'https://esm.run/@material/web/textfield/filled-text-field.js';
-    import 'https://esm.run/@material/web/button/filled-button.js';
-  </script>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500&display=swap">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <style>
-    html, body { height: 100%; margin: 0; padding: 0; }
-    body { min-height: 100vh; background: #f5f5f5; color: #222; font-family: Roboto, Arial, sans-serif; }
-    .safe-area { padding-bottom: env(safe-area-inset-bottom); }
-    mwc-textfield, mwc-button { width: 100%; margin-bottom: 16px; }
-    mwc-button { margin-top: 8px; }
-    .material-card {
-      max-width: 420px;
-      margin: 32px auto 0 auto;
-      padding: 24px 16px 32px 16px;
-      border-radius: 20px;
-      background: #fff;
-      box-shadow: 0 2px 16px 0 #0001;
-    }
-    .material-title {
-      font-size: 2rem;
-      font-weight: 500;
-      text-align: center;
-      margin-bottom: 24px;
-      letter-spacing: -0.5px;
-    }
-    .material-table {
-      width: 100%;
-      border-radius: 12px;
-      overflow: hidden;
-      background: #fafafa;
-      margin-top: 16px;
-      font-size: 1rem;
-    }
-    .material-table th, .material-table td {
-      padding: 8px 4px;
-      text-align: center;
-    }
-    .material-table th {
-      background: #f0f0f0;
-      font-weight: 500;
-    }
-    .material-table tr:nth-child(even) { background: #f7f7f7; }
-    .material-success { color: #388e3c; font-weight: 500; }
-    .material-error { color: #d32f2f; font-weight: 500; }
-    @media (max-width: 480px) {
-      .material-card { padding: 12px 2px 20px 2px; }
-      .material-title { font-size: 1.3rem; }
-    }
-  </style>
-</head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
-    <script>eruda.init();</script>
-  <div class="safe-area flex-1 flex flex-col">
-    <pea-app></pea-app>
-  </div>
-  <script type="module" src="./src/main.js"></script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <meta name="theme-color" content="#0f172a" />
+    <link rel="manifest" href="/public/manifest.json" />
+    <link rel="apple-touch-icon" href="/public/icon-192.png">
+    <title>PEA Rental Calc</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>
