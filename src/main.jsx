@@ -6,9 +6,9 @@ import './styles.css'
 const root = createRoot(document.getElementById('root'))
 root.render(<App />)
 
-// Register service worker if available (public/service-worker.js)
+// Register service worker if available (use relative path for GitHub Pages)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/public/service-worker.js').catch(() => {});
+    navigator.serviceWorker.register('./service-worker.js').catch(() => {});
   })
 }
