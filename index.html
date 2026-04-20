@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <!-- Eruda для мобильной отладки -->
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
   <meta name="theme-color" content="#0f172a" />
@@ -61,6 +63,7 @@
   </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+    <script>eruda.init();</script>
   <div class="safe-area flex-1 flex flex-col">
     <pea-app></pea-app>
   </div>
