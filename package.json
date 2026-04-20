@@ -1,0 +1,13 @@
+{
+  "name": "pea-rental-calc",
+  "version": "1.0.0",
+  "description": "PWA калькулятор аренды помещений (PEA)",
+  "scripts": {
+    "start": "npx serve public"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "tailwindcss": "^3.4.1",
+    "serve": "^14.2.0"
+  }
+}
