@@ -12,8 +12,11 @@
   <link rel="manifest" href="./manifest.json" />
   <link rel="apple-touch-icon" href="icon-192.png">
   <title>PEA Rental Calc</title>
-  <!-- Material Web Components -->
-  <script type="module" src="https://cdn.jsdelivr.net/npm/@material/web@1.0.0/dist/material-web.min.js"></script>
+  <!-- Material Web Components (ESM imports) -->
+  <script type="module">
+    import 'https://esm.run/@material/web/textfield/filled-text-field.js';
+    import 'https://esm.run/@material/web/button/filled-button.js';
+  </script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <style>
