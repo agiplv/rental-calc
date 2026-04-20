@@ -1,37 +1,79 @@
 const template = document.createElement('template');
 template.innerHTML = `
-  <div class="max-w-md mx-auto p-4 pb-8 rounded-xl shadow-lg bg-slate-900/90 backdrop-blur">
-    <h1 class="text-2xl font-bold mb-4 text-center tracking-tight">PEA Rental Calc</h1>
-    <form id="rental-form" class="space-y-4" autocomplete="on">
-      <div>
-        <label class="block mb-1" for="rooms">Площади помещений (через запятую, м²):</label>
-        <input type="text" inputmode="decimal" pattern="[\d., ]+" name="rooms" id="rooms" class="w-full p-3 rounded-lg bg-slate-800 text-slate-100 border border-slate-700 focus:ring-2 focus:ring-blue-500 transition" required autocapitalize="off" autocomplete="on" autocorrect="off" spellcheck="false" placeholder="например: 48, 34, 14, 10" />
-      </div>
-      <div class="flex gap-2">
-        <div class="flex-1">
-          <label class="block mb-1" for="monthlyFee">Коммунальные (€/мес):</label>
-          <input type="number" name="monthlyFee" id="monthlyFee" class="w-full p-3 rounded-lg bg-slate-800 text-slate-100 border border-slate-700 focus:ring-2 focus:ring-blue-500 transition" value="250" required inputmode="decimal" autocomplete="on" />
-        </div>
-        <div class="flex-1">
-          <label class="block mb-1" for="tax">Налог (%):</label>
-          <input type="number" name="tax" id="tax" class="w-full p-3 rounded-lg bg-slate-800 text-slate-100 border border-slate-700 focus:ring-2 focus:ring-blue-500 transition" value="10" required inputmode="decimal" autocomplete="on" />
-        </div>
-      </div>
-      <div class="flex gap-2 flex-wrap">
-        <div class="flex-1 min-w-[120px]">
-          <label class="block mb-1" for="profit">Годовая прибыль (%):</label>
-          <input type="number" name="profit" id="profit" class="w-full p-3 rounded-lg bg-slate-800 text-slate-100 border border-slate-700 focus:ring-2 focus:ring-blue-500 transition" value="15" required inputmode="decimal" autocomplete="on" />
-        </div>
-        <div class="flex-1 min-w-[120px]">
-          <label class="block mb-1" for="investment">Инвестиции (€):</label>
-          <input type="number" name="investment" id="investment" class="w-full p-3 rounded-lg bg-slate-800 text-slate-100 border border-slate-700 focus:ring-2 focus:ring-blue-500 transition" value="25000" required inputmode="decimal" autocomplete="on" />
-        </div>
-        <div class="flex-1 min-w-[120px]">
-          <label class="block mb-1" for="minProfit">Мин. прибыль (€/мес):</label>
-          <input type="number" name="minProfit" id="minProfit" class="w-full p-3 rounded-lg bg-slate-800 text-slate-100 border border-slate-700 focus:ring-2 focus:ring-blue-500 transition" value="100" required inputmode="decimal" autocomplete="on" />
-        </div>
-      </div>
-      <button type="submit" class="w-full py-3 mt-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-semibold text-lg shadow transition active:scale-95">Рассчитать</button>
+  <div class="material-card">
+    <div class="material-title">PEA Rental Calc</div>
+    <form id="rental-form" autocomplete="on">
+      <mwc-textfield
+        label="Площади помещений (через запятую, м²)"
+        name="rooms"
+        id="rooms"
+        type="text"
+        required
+        placeholder="например: 48, 34, 14, 10"
+        outlined
+        autocapitalize="off"
+        autocomplete="on"
+        autocorrect="off"
+        spellcheck="false"
+        pattern="[\d., ]+"
+        inputmode="decimal"
+      ></mwc-textfield>
+      <mwc-textfield
+        label="Коммунальные (€/мес)"
+        name="monthlyFee"
+        id="monthlyFee"
+        type="number"
+        required
+        value="250"
+        outlined
+        inputmode="decimal"
+        autocomplete="on"
+      ></mwc-textfield>
+      <mwc-textfield
+        label="Налог (%)"
+        name="tax"
+        id="tax"
+        type="number"
+        required
+        value="10"
+        outlined
+        inputmode="decimal"
+        autocomplete="on"
+      ></mwc-textfield>
+      <mwc-textfield
+        label="Годовая прибыль (%)"
+        name="profit"
+        id="profit"
+        type="number"
+        required
+        value="15"
+        outlined
+        inputmode="decimal"
+        autocomplete="on"
+      ></mwc-textfield>
+      <mwc-textfield
+        label="Инвестиции (€)"
+        name="investment"
+        id="investment"
+        type="number"
+        required
+        value="25000"
+        outlined
+        inputmode="decimal"
+        autocomplete="on"
+      ></mwc-textfield>
+      <mwc-textfield
+        label="Мин. прибыль (€/мес)"
+        name="minProfit"
+        id="minProfit"
+        type="number"
+        required
+        value="100"
+        outlined
+        inputmode="decimal"
+        autocomplete="on"
+      ></mwc-textfield>
+      <mwc-button raised label="Рассчитать" type="submit"></mwc-button>
     </form>
     <div id="result" class="mt-6"></div>
   </div>
@@ -57,6 +99,10 @@ class PeaApp extends HTMLElement {
       this.form.profit.value = data.profit * 100;
       this.form.investment.value = data.investment;
       this.form.minProfit.value = data.minProfit;
+      // Для MWC
+      this.form.querySelectorAll('mwc-textfield').forEach(tf => {
+        if (data[tf.name] !== undefined) tf.value = tf.name === 'rooms' ? data.rooms.join(', ') : data[tf.name];
+      });
       this.renderResult(data);
     }
     this.form.addEventListener('submit', this.onSubmit.bind(this));
@@ -64,12 +110,13 @@ class PeaApp extends HTMLElement {
 
   onSubmit(e) {
     e.preventDefault();
-    const rooms = this.form.rooms.value.split(',').map(s => parseFloat(s.trim())).filter(Boolean);
-    const monthlyFee = parseFloat(this.form.monthlyFee.value);
-    const tax = parseFloat(this.form.tax.value) / 100;
-    const profit = parseFloat(this.form.profit.value) / 100;
-    const investment = parseFloat(this.form.investment.value);
-    const minProfit = parseFloat(this.form.minProfit.value);
+    // Для MWC
+    const rooms = this.form.rooms.value ? this.form.rooms.value.split(',').map(s => parseFloat(s.trim())).filter(Boolean) : this.form.querySelector('[name=rooms]').value.split(',').map(s => parseFloat(s.trim())).filter(Boolean);
+    const monthlyFee = parseFloat(this.form.monthlyFee?.value || this.form.querySelector('[name=monthlyFee]').value);
+    const tax = parseFloat(this.form.tax?.value || this.form.querySelector('[name=tax]').value) / 100;
+    const profit = parseFloat(this.form.profit?.value || this.form.querySelector('[name=profit]').value) / 100;
+    const investment = parseFloat(this.form.investment?.value || this.form.querySelector('[name=investment]').value);
+    const minProfit = parseFloat(this.form.minProfit?.value || this.form.querySelector('[name=minProfit]').value);
     const data = { rooms, monthlyFee, tax, profit, investment, minProfit };
     localStorage.setItem('pea-rental-calc', JSON.stringify(data));
     this.renderResult(data);
@@ -77,7 +124,7 @@ class PeaApp extends HTMLElement {
 
   renderResult({ rooms, monthlyFee, tax, profit, investment, minProfit }) {
     if (!rooms.length || rooms.some(isNaN)) {
-      this.result.innerHTML = '<div class="text-red-400">Введите корректные площади помещений.</div>';
+      this.result.innerHTML = '<div class="material-error">Введите корректные площади помещений.</div>';
       return;
     }
     const res = calculateRentalPrices(rooms, monthlyFee, tax, profit, investment, minProfit);
@@ -132,8 +179,8 @@ function calculateRentalPrices(
         <div>Цена аренды: <b>${pricePerSqM.toFixed(2)} €/м²/мес</b></div>
         <div>Коммунальные: <b>${monthlyFeePerSqM.toFixed(2)} €/м²/мес</b></div>
       </div>
-      <table class="w-full text-sm bg-slate-800 rounded overflow-hidden">
-        <thead class="bg-slate-700">
+      <table class="material-table">
+        <thead>
           <tr>
             <th>№</th><th>Площадь</th><th>Аренда</th><th>Коммун.</th><th>Итого</th>
           </tr>
@@ -146,7 +193,7 @@ function calculateRentalPrices(
         <div>Итого к оплате: <b>${totalIncomeBeforeTax.toFixed(2)} €</b></div>
         <div>Налог (${(tax * 100).toFixed(1)}%): <b>${totalTaxPaid.toFixed(2)} €</b></div>
         <div class="text-lg mt-2">Чистая прибыль: <b>${netProfit.toFixed(2)} €</b></div>
-        <div class="mt-2 font-bold ${isGoalAchieved ? 'text-green-400' : 'text-red-400'}">
+        <div class="mt-2 font-bold ${isGoalAchieved ? 'material-success' : 'material-error'}">
           Цель: ${monthlyTargetProfit.toFixed(2)} € ${isGoalAchieved ? '→ ЦЕЛЬ ДОСТИГНУТА! 🎉' : '→ ЦЕЛЬ НЕ ДОСТИГНУТА! 😔'}
         </div>
       </div>
