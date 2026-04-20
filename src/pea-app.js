@@ -14,7 +14,6 @@ template.innerHTML = `
         autocomplete="on"
         autocorrect="off"
         spellcheck="false"
-        pattern="[\d., ]+"
         inputmode="decimal"
       ></md-filled-text-field>
       <md-filled-text-field
@@ -99,7 +98,11 @@ class PeaApp extends HTMLElement {
   onSubmit(e) {
     e.preventDefault();
     // Для Material Web
-    const rooms = this.form.querySelector('[name=rooms]').value.split(',').map(s => parseFloat(s.trim())).filter(Boolean);
+    const rooms = this.form.querySelector('[name=rooms]').value
+      .split(',')
+      .map(s => s.replace(/[^\d.]/g, '').replace(/^\./, ''))
+      .map(Number)
+      .filter(n => !isNaN(n) && n > 0);
     const monthlyFee = parseFloat(this.form.querySelector('[name=monthlyFee]').value);
     const tax = parseFloat(this.form.querySelector('[name=tax]').value) / 100;
     const profit = parseFloat(this.form.querySelector('[name=profit]').value) / 100;
