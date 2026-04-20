@@ -1,37 +1,37 @@
 const template = document.createElement('template');
 template.innerHTML = `
-  <div class="max-w-2xl mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-4 text-center">PEA Rental Calc</h1>
-    <form id="rental-form" class="space-y-4">
+  <div class="max-w-md mx-auto p-4 pb-8 rounded-xl shadow-lg bg-slate-900/90 backdrop-blur">
+    <h1 class="text-2xl font-bold mb-4 text-center tracking-tight">PEA Rental Calc</h1>
+    <form id="rental-form" class="space-y-4" autocomplete="on">
       <div>
-        <label class="block mb-1">Площади помещений (через запятую, м²):</label>
-        <input type="text" name="rooms" class="w-full p-2 rounded bg-slate-800 text-slate-100" required />
+        <label class="block mb-1" for="rooms">Площади помещений (через запятую, м²):</label>
+        <input type="text" inputmode="decimal" pattern="[\d., ]+" name="rooms" id="rooms" class="w-full p-3 rounded-lg bg-slate-800 text-slate-100 border border-slate-700 focus:ring-2 focus:ring-blue-500 transition" required autocapitalize="off" autocomplete="on" autocorrect="off" spellcheck="false" placeholder="например: 48, 34, 14, 10" />
       </div>
       <div class="flex gap-2">
         <div class="flex-1">
-          <label class="block mb-1">Коммунальные (€/мес):</label>
-          <input type="number" name="monthlyFee" class="w-full p-2 rounded bg-slate-800 text-slate-100" value="250" required />
+          <label class="block mb-1" for="monthlyFee">Коммунальные (€/мес):</label>
+          <input type="number" name="monthlyFee" id="monthlyFee" class="w-full p-3 rounded-lg bg-slate-800 text-slate-100 border border-slate-700 focus:ring-2 focus:ring-blue-500 transition" value="250" required inputmode="decimal" autocomplete="on" />
         </div>
         <div class="flex-1">
-          <label class="block mb-1">Налог (%):</label>
-          <input type="number" name="tax" class="w-full p-2 rounded bg-slate-800 text-slate-100" value="10" required />
+          <label class="block mb-1" for="tax">Налог (%):</label>
+          <input type="number" name="tax" id="tax" class="w-full p-3 rounded-lg bg-slate-800 text-slate-100 border border-slate-700 focus:ring-2 focus:ring-blue-500 transition" value="10" required inputmode="decimal" autocomplete="on" />
         </div>
       </div>
-      <div class="flex gap-2">
-        <div class="flex-1">
-          <label class="block mb-1">Годовая прибыль (%):</label>
-          <input type="number" name="profit" class="w-full p-2 rounded bg-slate-800 text-slate-100" value="15" required />
+      <div class="flex gap-2 flex-wrap">
+        <div class="flex-1 min-w-[120px]">
+          <label class="block mb-1" for="profit">Годовая прибыль (%):</label>
+          <input type="number" name="profit" id="profit" class="w-full p-3 rounded-lg bg-slate-800 text-slate-100 border border-slate-700 focus:ring-2 focus:ring-blue-500 transition" value="15" required inputmode="decimal" autocomplete="on" />
         </div>
-        <div class="flex-1">
-          <label class="block mb-1">Инвестиции (€):</label>
-          <input type="number" name="investment" class="w-full p-2 rounded bg-slate-800 text-slate-100" value="25000" required />
+        <div class="flex-1 min-w-[120px]">
+          <label class="block mb-1" for="investment">Инвестиции (€):</label>
+          <input type="number" name="investment" id="investment" class="w-full p-3 rounded-lg bg-slate-800 text-slate-100 border border-slate-700 focus:ring-2 focus:ring-blue-500 transition" value="25000" required inputmode="decimal" autocomplete="on" />
         </div>
-        <div class="flex-1">
-          <label class="block mb-1">Мин. прибыль (€/мес):</label>
-          <input type="number" name="minProfit" class="w-full p-2 rounded bg-slate-800 text-slate-100" value="100" required />
+        <div class="flex-1 min-w-[120px]">
+          <label class="block mb-1" for="minProfit">Мин. прибыль (€/мес):</label>
+          <input type="number" name="minProfit" id="minProfit" class="w-full p-3 rounded-lg bg-slate-800 text-slate-100 border border-slate-700 focus:ring-2 focus:ring-blue-500 transition" value="100" required inputmode="decimal" autocomplete="on" />
         </div>
       </div>
-      <button type="submit" class="w-full py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold">Рассчитать</button>
+      <button type="submit" class="w-full py-3 mt-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-semibold text-lg shadow transition active:scale-95">Рассчитать</button>
     </form>
     <div id="result" class="mt-6"></div>
   </div>
