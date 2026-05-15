@@ -43,12 +43,16 @@ body {
   background: #fff;
 }
 
+.panel-card .card-content {
+  padding: 14px;
+}
+
 .calculator-layout {
   margin: 0;
-  padding: 12px;
+  padding: 10px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 12px;
+  gap: 10px;
   align-items: start;
 }
 
@@ -56,8 +60,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
+  gap: 10px;
+  margin-bottom: 8px;
 }
 
 .section-heading h2 {
@@ -74,18 +78,17 @@ body {
 }
 
 .result-heading {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .form-group {
-  margin-top: 14px;
+  margin-top: 10px;
 }
 
-.form-group h3 {
-  margin: 0 0 8px 6px;
+.form-group .block-title {
+  margin: 0 0 6px 6px;
   color: #636366;
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: 0.79rem;
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
@@ -99,24 +102,23 @@ body {
   min-height: 52px;
 }
 
-.status-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 30px;
+.status-chip.chip {
+  height: 28px;
   padding: 0 10px;
-  border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 600;
   white-space: nowrap;
 }
 
-.status-pill.is-success {
+.status-chip .chip-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.status-chip.is-success {
   color: #146c2e;
   background: rgba(52, 199, 89, 0.18);
 }
 
-.status-pill.is-warning {
+.status-chip.is-warning {
   color: #8f5200;
   background: rgba(255, 149, 0, 0.2);
 }
@@ -138,56 +140,19 @@ body {
 }
 
 .room-results {
-  margin-top: 14px;
-  border: 1px solid rgba(60, 60, 67, 0.16);
-  border-radius: 12px;
-  background: #fafafc;
-  overflow: auto;
-  max-height: min(42vh, 340px);
+  margin-top: 12px;
 }
 
-.room-results-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 560px;
-  font-size: 0.9rem;
+.room-results-list {
+  margin: 0;
 }
 
-.room-results-table thead th {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: #f2f2f7;
+.room-results-list .item-subtitle {
   color: #636366;
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  text-align: left;
-  padding: 9px 10px;
-  white-space: nowrap;
 }
 
-.room-results-table th,
-.room-results-table td {
-  padding: 10px;
-  border-top: 1px solid rgba(60, 60, 67, 0.12);
-  white-space: nowrap;
-}
-
-.room-results-table tbody tr:first-child th,
-.room-results-table tbody tr:first-child td {
-  border-top: none;
-}
-
-.room-results-table tbody th {
-  font-weight: 600;
-  text-align: left;
-}
-
-.room-results-table tbody td {
-  color: #1c1c1e;
-  font-weight: 600;
+.room-results-list .item-text {
+  font-size: 0.86rem;
 }
 
 @media (max-width: 640px) {
@@ -196,12 +161,18 @@ body {
   }
 
   .calculator-layout {
-    padding: 12px;
+    padding: 8px;
     grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .panel-card .card-content {
+    padding: 12px;
   }
 
   .section-heading {
     flex-direction: column;
     align-items: stretch;
+    gap: 6px;
   }
 }
