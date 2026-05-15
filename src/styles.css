@@ -29,7 +29,7 @@ body {
 }
 
 .app-page {
-  padding-bottom: calc(env(safe-area-inset-bottom) + 20px);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 12px);
 }
 
 .app-navbar .navbar-bg {
@@ -156,23 +156,84 @@ body {
 }
 
 @media (max-width: 640px) {
+  .app-page {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .app-page .page-content {
+    overflow: hidden;
+  }
+
   .panel-card {
     margin: 0;
+    min-height: 0;
   }
 
   .calculator-layout {
+    height: calc(
+      100dvh - var(--f7-navbar-height) - env(safe-area-inset-top) - env(safe-area-inset-bottom)
+    );
     padding: 8px;
     grid-template-columns: 1fr;
+    grid-template-rows: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
 
   .panel-card .card-content {
-    padding: 12px;
+    height: 100%;
+    overflow: auto;
+    padding: 10px;
   }
 
   .section-heading {
     flex-direction: column;
     align-items: stretch;
-    gap: 6px;
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+
+  .section-heading h2 {
+    font-size: 1.1rem;
+  }
+
+  .section-heading p {
+    margin-top: 2px;
+    font-size: 0.82rem;
+  }
+
+  .form-group {
+    margin-top: 8px;
+  }
+
+  .form-group .block-title {
+    margin-bottom: 4px;
+    font-size: 0.72rem;
+  }
+
+  .input-list .item-content {
+    min-height: 46px;
+  }
+
+  .state-card {
+    margin-top: 6px;
+    padding: 10px 12px;
+    font-size: 0.86rem;
+  }
+
+  .status-chip.chip {
+    height: 24px;
+    padding: 0 8px;
+  }
+
+  .status-chip .chip-label {
+    font-size: 0.72rem;
+  }
+
+  .room-results {
+    margin-top: 8px;
+  }
+
+  .room-results-list .item-text {
+    font-size: 0.8rem;
   }
 }
