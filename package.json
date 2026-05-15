@@ -9,14 +9,14 @@
     "start": "npx serve dist"
   },
   "dependencies": {
-    "framework7": "^7.1.5",
-    "framework7-react": "^7.1.5",
+    "framework7": "^9.0.4",
+    "framework7-react": "^9.0.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "vite": "^5.0.0",
-    "@vitejs/plugin-react": "^5.0.0",
+    "vite": "^7.3.3",
+    "@vitejs/plugin-react": "^5.1.0",
     "serve": "^14.2.0"
   }
 }
