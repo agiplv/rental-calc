@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Block, Card, CardContent, List, ListInput, ListItem } from 'framework7-react'
+import { Block, BlockTitle, Card, CardContent, Chip, List, ListInput, ListItem } from 'framework7-react'
 import { calculateRentalPrices } from '../calc'
 
 const DEFAULTS = {
@@ -133,7 +133,7 @@ export default function Calculator() {
           </div>
 
           <div className="form-group">
-            <h3>Room setup</h3>
+            <BlockTitle medium>Room setup</BlockTitle>
             <List inset strong dividersIos className="input-list">
               <ListInput
                 clearButton
@@ -148,7 +148,7 @@ export default function Calculator() {
           </div>
 
           <div className="form-group">
-            <h3>Recurring costs</h3>
+            <BlockTitle medium>Recurring costs</BlockTitle>
             <List inset strong dividersIos className="input-list">
               <ListInput
                 clearButton
@@ -176,7 +176,7 @@ export default function Calculator() {
           </div>
 
           <div className="form-group">
-            <h3>Profit goals</h3>
+            <BlockTitle medium>Profit goals</BlockTitle>
             <List inset strong dividersIos className="input-list">
               <ListInput
                 clearButton
@@ -224,9 +224,10 @@ export default function Calculator() {
               <p>Per-room pricing and overall profitability.</p>
             </div>
             {result && (
-              <span className={`status-pill ${result.isGoalAchieved ? 'is-success' : 'is-warning'}`}>
-                {result.isGoalAchieved ? 'Goal achieved' : 'Goal not reached'}
-              </span>
+              <Chip
+                className={`status-chip ${result.isGoalAchieved ? 'is-success' : 'is-warning'}`}
+                text={result.isGoalAchieved ? 'Goal achieved' : 'Goal not reached'}
+              />
             )}
           </div>
 
@@ -259,28 +260,17 @@ export default function Calculator() {
               </List>
 
               <div className="room-results" role="region" aria-label="Per-room pricing breakdown">
-                <table className="room-results-table">
-                  <thead>
-                    <tr>
-                      <th scope="col">Room</th>
-                      <th scope="col">Area</th>
-                      <th scope="col">Rent</th>
-                      <th scope="col">Fees</th>
-                      <th scope="col">Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {result.rows.map(row => (
-                      <tr key={row.index}>
-                        <th scope="row">Room {row.index}</th>
-                        <td>{formatArea(row.area)}</td>
-                        <td>{formatMoney(row.rent)}</td>
-                        <td>{formatMoney(row.fee)}</td>
-                        <td>{formatMoney(row.total)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <List inset strong dividersIos className="room-results-list">
+                  {result.rows.map(row => (
+                    <ListItem
+                      key={row.index}
+                      title={`Room ${row.index}`}
+                      subtitle={formatArea(row.area)}
+                      after={formatMoney(row.total)}
+                      text={`${formatMoney(row.rent)} rent · ${formatMoney(row.fee)} fees`}
+                    />
+                  ))}
+                </List>
               </div>
             </>
           )}
