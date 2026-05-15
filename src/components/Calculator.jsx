@@ -152,7 +152,7 @@ export default function Calculator() {
       </Toolbar>
 
       <Tabs animated>
-        <Tab id="tab-inputs" tabActive={activeTab === 'inputs'}>
+        <Tab id="tab-inputs" tabActive={activeTab === 'inputs'} className="page-content">
           <BlockTitle medium>Room setup</BlockTitle>
           <List inset strong dividersIos>
             <ListInput
@@ -230,7 +230,7 @@ export default function Calculator() {
           </List>
         </Tab>
 
-        <Tab id="tab-results" tabActive={activeTab === 'results'}>
+        <Tab id="tab-results" tabActive={activeTab === 'results'} className="page-content">
           {roomsError && (
             <Block strong inset role="alert" className="text-color-red">
               {roomsError}
