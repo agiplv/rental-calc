@@ -1,23 +1,28 @@
 import React from 'react'
-import { CssBaseline, Container, AppBar, Toolbar, Typography, Box } from '@mui/material'
+import { App as Framework7App, Block, Navbar, Page, View } from 'framework7-react'
 import Calculator from './components/Calculator'
 
 export default function App() {
   return (
-    <>
-      <CssBaseline />
-      <AppBar position="static" color="primary">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            PEA Rental Calc
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Box sx={{ py: 2 }}>
-        <Container maxWidth="sm">
+    <Framework7App name="PEA Rental Calc" theme="ios">
+      <View main url="/">
+        <Page className="app-page" noToolbar noSwipeback>
+          <Navbar
+            className="app-navbar"
+            title="PEA Rental Calc"
+            subtitle="Rental pricing planner"
+          />
+          <Block strong inset className="hero-card">
+            <div className="hero-kicker">Framework7 iOS redesign</div>
+            <h1>Plan room pricing with a cleaner mobile-first flow.</h1>
+            <p>
+              Enter the room areas, monthly costs, and profit target to see an instant
+              room-by-room breakdown.
+            </p>
+          </Block>
           <Calculator />
-        </Container>
-      </Box>
-    </>
+        </Page>
+      </View>
+    </Framework7App>
   )
 }
