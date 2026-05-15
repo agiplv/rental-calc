@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Block, Button, Card, CardContent, List, ListInput, ListItem } from 'framework7-react'
+import { Block, Card, CardContent, List, ListInput, ListItem } from 'framework7-react'
 import { calculateRentalPrices } from '../calc'
 
 const DEFAULTS = {
@@ -27,6 +27,7 @@ export default function Calculator() {
   const [investment, setInvestment] = useState(DEFAULTS.investment)
   const [minProfit, setMinProfit] = useState(DEFAULTS.minProfit)
   const [result, setResult] = useState(null)
+  const [roomsError, setRoomsError] = useState('')
 
   useEffect(() => {
     try {
@@ -98,17 +99,16 @@ export default function Calculator() {
     )
   }
 
-  function onCalc(e) {
-    if (e && e.preventDefault) e.preventDefault()
-    const rooms = parseRooms(roomsText)
-    compute(rooms)
-  }
-
-  // Live calculation: recalculate when inputs change (debounced)
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
       const rooms = parseRooms(roomsText)
+      if (roomsText.trim().length > 0 && rooms.length === 0) {
+        setRoomsError('Enter valid room areas separated by commas, semicolons, or line breaks.')
+        setResult(null)
+        return
+      }
+      setRoomsError('')
       compute(
         rooms,
         toNumber(monthlyFee, DEFAULTS.monthlyFee),
@@ -125,122 +125,168 @@ export default function Calculator() {
     <Block className="calculator-layout">
       <Card className="panel-card">
         <CardContent>
-          <form onSubmit={onCalc}>
-            <div className="section-heading">
-              <div>
-                <h2>Inputs</h2>
-                <p>Update the assumptions to refresh the pricing instantly.</p>
-              </div>
-              <Button fill round type="submit">
-                Recalculate
-              </Button>
+          <div className="section-heading">
+            <div>
+              <h2>Inputs</h2>
+              <p>Values update results automatically as you type.</p>
             </div>
+          </div>
 
+          <div className="form-group">
+            <h3>Room setup</h3>
             <List inset strong dividersIos className="input-list">
               <ListInput
                 clearButton
                 label="Room areas"
                 placeholder="48, 34, 14, 10"
                 type="textarea"
+                info="Use commas, semicolons, or line breaks."
                 value={roomsText}
                 onInput={e => setRoomsText(e.target.value)}
               />
+            </List>
+          </div>
+
+          <div className="form-group">
+            <h3>Recurring costs</h3>
+            <List inset strong dividersIos className="input-list">
               <ListInput
                 clearButton
+                inputmode="decimal"
+                min="0"
+                step="0.01"
                 label="Monthly fees (€)"
+                placeholder="250"
                 type="number"
                 value={monthlyFee}
                 onInput={e => setMonthlyFee(e.target.value)}
               />
               <ListInput
                 clearButton
+                inputmode="decimal"
+                min="0"
+                step="0.01"
                 label="Tax (%)"
+                placeholder="10"
                 type="number"
                 value={tax}
                 onInput={e => setTax(e.target.value)}
               />
+            </List>
+          </div>
+
+          <div className="form-group">
+            <h3>Profit goals</h3>
+            <List inset strong dividersIos className="input-list">
               <ListInput
                 clearButton
+                inputmode="decimal"
+                min="0"
+                step="0.01"
                 label="Annual profit (%)"
+                placeholder="15"
                 type="number"
                 value={profit}
                 onInput={e => setProfit(e.target.value)}
               />
               <ListInput
                 clearButton
+                inputmode="decimal"
+                min="0"
+                step="0.01"
                 label="Investment (€)"
+                placeholder="25000"
                 type="number"
                 value={investment}
                 onInput={e => setInvestment(e.target.value)}
               />
               <ListInput
                 clearButton
+                inputmode="decimal"
+                min="0"
+                step="0.01"
                 label="Minimum monthly profit (€)"
+                placeholder="100"
                 type="number"
                 value={minProfit}
                 onInput={e => setMinProfit(e.target.value)}
               />
             </List>
-          </form>
+          </div>
         </CardContent>
       </Card>
 
-      {result && (
-        <Card className="panel-card">
-          <CardContent>
-            <div className="section-heading result-heading">
-              <div>
-                <h2>Results</h2>
-                <p>Per-room pricing and overall profitability.</p>
-              </div>
-              <span
-                className={`status-pill ${result.isGoalAchieved ? 'is-success' : 'is-warning'}`}
-              >
-                {result.isGoalAchieved ? 'Goal achieved' : 'Goal missed'}
+      <Card className="panel-card">
+        <CardContent>
+          <div className="section-heading result-heading">
+            <div>
+              <h2>Results</h2>
+              <p>Per-room pricing and overall profitability.</p>
+            </div>
+            {result && (
+              <span className={`status-pill ${result.isGoalAchieved ? 'is-success' : 'is-warning'}`}>
+                {result.isGoalAchieved ? 'Goal achieved' : 'Goal not reached'}
               </span>
-            </div>
+            )}
+          </div>
 
-            <List inset strong dividersIos className="summary-list">
-              <ListItem title="Total area" after={formatArea(result.roomsTotalArea)} />
-              <ListItem title="Target profit" after={formatMoney(result.monthlyTargetProfit)} />
-              <ListItem title="Rent price" after={formatMoney(result.pricePerSqM, '€/m²')} />
-              <ListItem
-                title="Monthly fees"
-                after={formatMoney(result.monthlyFeePerSqM, '€/m²')}
-              />
-              <ListItem title="Total rent" after={formatMoney(result.totalRent)} />
-              <ListItem title="Total fees" after={formatMoney(result.totalFees)} />
-              <ListItem title="Tax paid" after={formatMoney(result.totalTaxPaid)} />
-              <ListItem title="Net profit" after={formatMoney(result.netProfit)} />
-            </List>
-
-            <div className="results-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Room</th>
-                    <th>Area</th>
-                    <th>Rent</th>
-                    <th>Fees</th>
-                    <th>Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {result.rows.map(row => (
-                    <tr key={row.index}>
-                      <td>{row.index}</td>
-                      <td>{formatArea(row.area)}</td>
-                      <td>{formatMoney(row.rent)}</td>
-                      <td>{formatMoney(row.fee)}</td>
-                      <td>{formatMoney(row.total)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {roomsError && (
+            <div className="state-card state-error" role="alert">
+              {roomsError}
             </div>
-          </CardContent>
-        </Card>
-      )}
+          )}
+
+          {!roomsError && !result && (
+            <div className="state-card">
+              Enter at least one room area to see pricing results.
+            </div>
+          )}
+
+          {result && (
+            <>
+              <List inset strong dividersIos className="summary-list">
+                <ListItem title="Total area" after={formatArea(result.roomsTotalArea)} />
+                <ListItem title="Target profit" after={formatMoney(result.monthlyTargetProfit)} />
+                <ListItem title="Rent price" after={formatMoney(result.pricePerSqM, '€/m²')} />
+                <ListItem
+                  title="Monthly fees"
+                  after={formatMoney(result.monthlyFeePerSqM, '€/m²')}
+                />
+                <ListItem title="Total rent" after={formatMoney(result.totalRent)} />
+                <ListItem title="Total fees" after={formatMoney(result.totalFees)} />
+                <ListItem title="Tax paid" after={formatMoney(result.totalTaxPaid)} />
+                <ListItem title="Net profit" after={formatMoney(result.netProfit)} />
+              </List>
+
+              <div className="room-results">
+                {result.rows.map(row => (
+                  <div className="room-result-item" key={row.index}>
+                    <h3>Room {row.index}</h3>
+                    <dl>
+                      <div>
+                        <dt>Area</dt>
+                        <dd>{formatArea(row.area)}</dd>
+                      </div>
+                      <div>
+                        <dt>Rent</dt>
+                        <dd>{formatMoney(row.rent)}</dd>
+                      </div>
+                      <div>
+                        <dt>Fees</dt>
+                        <dd>{formatMoney(row.fee)}</dd>
+                      </div>
+                      <div>
+                        <dt>Total</dt>
+                        <dd>{formatMoney(row.total)}</dd>
+                      </div>
+                    </dl>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
     </Block>
   )
 }
