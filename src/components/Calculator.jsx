@@ -258,30 +258,29 @@ export default function Calculator() {
                 <ListItem title="Net profit" after={formatMoney(result.netProfit)} />
               </List>
 
-              <div className="room-results">
-                {result.rows.map(row => (
-                  <div className="room-result-item" key={row.index}>
-                    <h3>Room {row.index}</h3>
-                    <dl>
-                      <div>
-                        <dt>Area</dt>
-                        <dd>{formatArea(row.area)}</dd>
-                      </div>
-                      <div>
-                        <dt>Rent</dt>
-                        <dd>{formatMoney(row.rent)}</dd>
-                      </div>
-                      <div>
-                        <dt>Fees</dt>
-                        <dd>{formatMoney(row.fee)}</dd>
-                      </div>
-                      <div>
-                        <dt>Total</dt>
-                        <dd>{formatMoney(row.total)}</dd>
-                      </div>
-                    </dl>
-                  </div>
-                ))}
+              <div className="room-results" role="region" aria-label="Per-room pricing breakdown">
+                <table className="room-results-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Room</th>
+                      <th scope="col">Area</th>
+                      <th scope="col">Rent</th>
+                      <th scope="col">Fees</th>
+                      <th scope="col">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {result.rows.map(row => (
+                      <tr key={row.index}>
+                        <th scope="row">Room {row.index}</th>
+                        <td>{formatArea(row.area)}</td>
+                        <td>{formatMoney(row.rent)}</td>
+                        <td>{formatMoney(row.fee)}</td>
+                        <td>{formatMoney(row.total)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </>
           )}
