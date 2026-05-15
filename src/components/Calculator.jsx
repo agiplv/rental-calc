@@ -1,5 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Block, BlockTitle, Card, CardContent, Chip, List, ListInput, ListItem } from 'framework7-react'
+import {
+  Block,
+  BlockTitle,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Chip,
+  Icon,
+  List,
+  ListInput,
+  ListItem,
+  Segmented,
+  Tab,
+  Tabs,
+} from 'framework7-react'
 import { calculateRentalPrices } from '../calc'
 
 const DEFAULTS = {
@@ -20,6 +35,7 @@ function formatArea(value) {
 }
 
 export default function Calculator() {
+  const [activeTab, setActiveTab] = useState('inputs')
   const [roomsText, setRoomsText] = useState(DEFAULTS.roomsText)
   const [monthlyFee, setMonthlyFee] = useState(DEFAULTS.monthlyFee)
   const [tax, setTax] = useState(DEFAULTS.tax)
@@ -123,105 +139,12 @@ export default function Calculator() {
 
   return (
     <Block className="calculator-layout">
-      <Card className="panel-card">
-        <CardContent>
+      <Card className="panel-card tabs-shell">
+        <CardHeader className="tabs-shell-header">
           <div className="section-heading">
             <div>
-              <h2>Inputs</h2>
-              <p>Values update results automatically as you type.</p>
-            </div>
-          </div>
-
-          <div className="form-group">
-            <BlockTitle medium>Room setup</BlockTitle>
-            <List inset strong dividersIos className="input-list">
-              <ListInput
-                clearButton
-                label="Room areas"
-                placeholder="48, 34, 14, 10"
-                type="textarea"
-                info="Use commas, semicolons, or line breaks."
-                value={roomsText}
-                onInput={e => setRoomsText(e.target.value)}
-              />
-            </List>
-          </div>
-
-          <div className="form-group">
-            <BlockTitle medium>Recurring costs</BlockTitle>
-            <List inset strong dividersIos className="input-list">
-              <ListInput
-                clearButton
-                inputmode="decimal"
-                min="0"
-                step="0.01"
-                label="Monthly fees (€)"
-                placeholder="250"
-                type="number"
-                value={monthlyFee}
-                onInput={e => setMonthlyFee(e.target.value)}
-              />
-              <ListInput
-                clearButton
-                inputmode="decimal"
-                min="0"
-                step="0.01"
-                label="Tax (%)"
-                placeholder="10"
-                type="number"
-                value={tax}
-                onInput={e => setTax(e.target.value)}
-              />
-            </List>
-          </div>
-
-          <div className="form-group">
-            <BlockTitle medium>Profit goals</BlockTitle>
-            <List inset strong dividersIos className="input-list">
-              <ListInput
-                clearButton
-                inputmode="decimal"
-                min="0"
-                step="0.01"
-                label="Annual profit (%)"
-                placeholder="15"
-                type="number"
-                value={profit}
-                onInput={e => setProfit(e.target.value)}
-              />
-              <ListInput
-                clearButton
-                inputmode="decimal"
-                min="0"
-                step="0.01"
-                label="Investment (€)"
-                placeholder="25000"
-                type="number"
-                value={investment}
-                onInput={e => setInvestment(e.target.value)}
-              />
-              <ListInput
-                clearButton
-                inputmode="decimal"
-                min="0"
-                step="0.01"
-                label="Minimum monthly profit (€)"
-                placeholder="100"
-                type="number"
-                value={minProfit}
-                onInput={e => setMinProfit(e.target.value)}
-              />
-            </List>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="panel-card">
-        <CardContent>
-          <div className="section-heading result-heading">
-            <div>
-              <h2>Results</h2>
-              <p>Per-room pricing and overall profitability.</p>
+              <h2>Calculator</h2>
+              <p>Switch tabs for Inputs and Results.</p>
             </div>
             {result && (
               <Chip
@@ -230,50 +153,156 @@ export default function Calculator() {
               />
             )}
           </div>
+        </CardHeader>
+        <CardContent>
+          <Segmented strongIos className="calc-tabs-nav">
+            <Button
+              tabLink="#tab-inputs"
+              tabLinkActive={activeTab === 'inputs'}
+              onClick={() => setActiveTab('inputs')}
+            >
+              <Icon f7="slider_horizontal_3" />
+              Inputs
+            </Button>
+            <Button
+              tabLink="#tab-results"
+              tabLinkActive={activeTab === 'results'}
+              onClick={() => setActiveTab('results')}
+            >
+              <Icon f7="chart_bar_alt_fill" />
+              Results
+            </Button>
+          </Segmented>
 
-          {roomsError && (
-            <div className="state-card state-error" role="alert">
-              {roomsError}
-            </div>
-          )}
-
-          {!roomsError && !result && (
-            <div className="state-card">
-              Enter at least one room area to see pricing results.
-            </div>
-          )}
-
-          {result && (
-            <>
-              <List inset strong dividersIos className="summary-list">
-                <ListItem title="Total area" after={formatArea(result.roomsTotalArea)} />
-                <ListItem title="Target profit" after={formatMoney(result.monthlyTargetProfit)} />
-                <ListItem title="Rent price" after={formatMoney(result.pricePerSqM, '€/m²')} />
-                <ListItem
-                  title="Monthly fees"
-                  after={formatMoney(result.monthlyFeePerSqM, '€/m²')}
-                />
-                <ListItem title="Total rent" after={formatMoney(result.totalRent)} />
-                <ListItem title="Total fees" after={formatMoney(result.totalFees)} />
-                <ListItem title="Tax paid" after={formatMoney(result.totalTaxPaid)} />
-                <ListItem title="Net profit" after={formatMoney(result.netProfit)} />
-              </List>
-
-              <div className="room-results" role="region" aria-label="Per-room pricing breakdown">
-                <List inset strong dividersIos className="room-results-list">
-                  {result.rows.map(row => (
-                    <ListItem
-                      key={row.index}
-                      title={`Room ${row.index}`}
-                      subtitle={formatArea(row.area)}
-                      after={formatMoney(row.total)}
-                      text={`${formatMoney(row.rent)} rent · ${formatMoney(row.fee)} fees`}
-                    />
-                  ))}
+          <Tabs animated className="calc-tabs-content">
+            <Tab id="tab-inputs" tabActive={activeTab === 'inputs'}>
+              <div className="form-group">
+                <BlockTitle medium>Room setup</BlockTitle>
+                <List inset strong dividersIos className="input-list">
+                  <ListInput
+                    clearButton
+                    label="Room areas"
+                    placeholder="48, 34, 14, 10"
+                    type="textarea"
+                    info="Use commas, semicolons, or line breaks."
+                    value={roomsText}
+                    onInput={e => setRoomsText(e.target.value)}
+                  />
                 </List>
               </div>
-            </>
-          )}
+
+              <div className="form-group">
+                <BlockTitle medium>Recurring costs</BlockTitle>
+                <List inset strong dividersIos className="input-list">
+                  <ListInput
+                    clearButton
+                    inputmode="decimal"
+                    min="0"
+                    step="0.01"
+                    label="Monthly fees (€)"
+                    placeholder="250"
+                    type="number"
+                    value={monthlyFee}
+                    onInput={e => setMonthlyFee(e.target.value)}
+                  />
+                  <ListInput
+                    clearButton
+                    inputmode="decimal"
+                    min="0"
+                    step="0.01"
+                    label="Tax (%)"
+                    placeholder="10"
+                    type="number"
+                    value={tax}
+                    onInput={e => setTax(e.target.value)}
+                  />
+                </List>
+              </div>
+
+              <div className="form-group">
+                <BlockTitle medium>Profit goals</BlockTitle>
+                <List inset strong dividersIos className="input-list">
+                  <ListInput
+                    clearButton
+                    inputmode="decimal"
+                    min="0"
+                    step="0.01"
+                    label="Annual profit (%)"
+                    placeholder="15"
+                    type="number"
+                    value={profit}
+                    onInput={e => setProfit(e.target.value)}
+                  />
+                  <ListInput
+                    clearButton
+                    inputmode="decimal"
+                    min="0"
+                    step="0.01"
+                    label="Investment (€)"
+                    placeholder="25000"
+                    type="number"
+                    value={investment}
+                    onInput={e => setInvestment(e.target.value)}
+                  />
+                  <ListInput
+                    clearButton
+                    inputmode="decimal"
+                    min="0"
+                    step="0.01"
+                    label="Minimum monthly profit (€)"
+                    placeholder="100"
+                    type="number"
+                    value={minProfit}
+                    onInput={e => setMinProfit(e.target.value)}
+                  />
+                </List>
+              </div>
+            </Tab>
+
+            <Tab id="tab-results" tabActive={activeTab === 'results'}>
+              {roomsError && (
+                <div className="state-card state-error" role="alert">
+                  {roomsError}
+                </div>
+              )}
+
+              {!roomsError && !result && (
+                <div className="state-card">Enter at least one room area to see pricing results.</div>
+              )}
+
+              {result && (
+                <>
+                  <List inset strong dividersIos className="summary-list">
+                    <ListItem title="Total area" after={formatArea(result.roomsTotalArea)} />
+                    <ListItem title="Target profit" after={formatMoney(result.monthlyTargetProfit)} />
+                    <ListItem title="Rent price" after={formatMoney(result.pricePerSqM, '€/m²')} />
+                    <ListItem
+                      title="Monthly fees"
+                      after={formatMoney(result.monthlyFeePerSqM, '€/m²')}
+                    />
+                    <ListItem title="Total rent" after={formatMoney(result.totalRent)} />
+                    <ListItem title="Total fees" after={formatMoney(result.totalFees)} />
+                    <ListItem title="Tax paid" after={formatMoney(result.totalTaxPaid)} />
+                    <ListItem title="Net profit" after={formatMoney(result.netProfit)} />
+                  </List>
+
+                  <div className="room-results" role="region" aria-label="Per-room pricing breakdown">
+                    <List inset strong dividersIos className="room-results-list">
+                      {result.rows.map(row => (
+                        <ListItem
+                          key={row.index}
+                          title={`Room ${row.index}`}
+                          subtitle={formatArea(row.area)}
+                          after={formatMoney(row.total)}
+                          text={`${formatMoney(row.rent)} rent · ${formatMoney(row.fee)} fees`}
+                        />
+                      ))}
+                    </List>
+                  </div>
+                </>
+              )}
+            </Tab>
+          </Tabs>
         </CardContent>
       </Card>
     </Block>
