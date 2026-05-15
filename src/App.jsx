@@ -6,8 +6,8 @@ export default function App() {
   return (
     <Framework7App name="PEA Rental Calc" theme="ios">
       <View main url="/">
-        <Page className="app-page" noToolbar noSwipeback>
-          <Navbar className="app-navbar" title="PEA Rental Calc" subtitle="Rental planner" />
+        <Page noToolbar noSwipeback>
+          <Navbar title="PEA Rental Calc" subtitle="Rental planner" />
           <Calculator />
         </Page>
       </View>
