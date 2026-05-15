@@ -2,14 +2,13 @@ import React, { useState, useEffect, useRef } from 'react'
 import {
   Block,
   BlockTitle,
-  Button,
-  Icon,
+  Link,
   List,
   ListInput,
   ListItem,
-  Segmented,
   Tab,
   Tabs,
+  Toolbar,
 } from 'framework7-react'
 import { calculateRentalPrices } from '../calc'
 
@@ -134,30 +133,23 @@ export default function Calculator() {
   }, [roomsText, monthlyFee, tax, profit, investment, minProfit])
 
   return (
-    <Block>
-      <Block strong inset>
-        <div>Calculator</div>
-        <div>Switch tabs for Inputs and Results.</div>
-      </Block>
-
-      <Segmented strongIos>
-        <Button
+    <>
+      <Toolbar bottom tabbar tabbarLabels>
+        <Link
           tabLink="#tab-inputs"
           tabLinkActive={activeTab === 'inputs'}
           onClick={() => setActiveTab('inputs')}
-        >
-          <Icon f7="slider_horizontal_3" />
-          Inputs
-        </Button>
-        <Button
+          iconF7="slider_horizontal_3"
+          text="Inputs"
+        />
+        <Link
           tabLink="#tab-results"
           tabLinkActive={activeTab === 'results'}
           onClick={() => setActiveTab('results')}
-        >
-          <Icon f7="chart_bar_alt_fill" />
-          Results
-        </Button>
-      </Segmented>
+          iconF7="chart_bar_alt_fill"
+          text="Results"
+        />
+      </Toolbar>
 
       <Tabs animated>
         <Tab id="tab-inputs" tabActive={activeTab === 'inputs'}>
@@ -282,6 +274,6 @@ export default function Calculator() {
           )}
         </Tab>
       </Tabs>
-    </Block>
+    </>
   )
 }
