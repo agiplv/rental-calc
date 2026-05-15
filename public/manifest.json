@@ -3,9 +3,9 @@
   "short_name": "RentalCalc",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#0f172a",
-  "description": "PWA калькулятор аренды помещений (PEA)",
+  "background_color": "#eef3fb",
+  "theme_color": "#2563eb",
+  "description": "PEA rental pricing calculator with an iOS-inspired Framework7 interface",
   "icons": [
     {
       "src": "icon-192.png",
