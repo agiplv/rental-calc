@@ -8,6 +8,8 @@ vi.mock('framework7-react', () => {
     'bottom',
     'clearButton',
     'deleteable',
+    'fill',
+    'large',
     'mediaList',
     'noMarginBottom',
     'noMarginTop',
@@ -154,18 +156,25 @@ describe('Calculator', () => {
     expect(screen.getByText('Check your inputs')).toBeInTheDocument()
   })
 
-  it('shows room add guidance and appends a new room from input', async () => {
+  it('disables add-room button for invalid input and appends a new room for valid input', async () => {
     render(<Calculator />)
 
-    expect(screen.getByText('How to add rooms')).toBeInTheDocument()
+    const addRoomButton = screen.getByRole('button', { name: /add room/i })
+    expect(addRoomButton).toBeDisabled()
 
     await act(async () => {
       fireEvent.input(screen.getByLabelText('New room area (m²)'), { target: { value: '22' } })
-      fireEvent.click(screen.getByRole('button', { name: 'Add room' }))
+    })
+
+    expect(addRoomButton).not.toBeDisabled()
+
+    await act(async () => {
+      fireEvent.click(addRoomButton)
       vi.advanceTimersByTime(350)
       vi.runOnlyPendingTimers()
     })
 
+    expect(addRoomButton).toBeDisabled()
     expect(screen.getByText('22 m²')).toBeInTheDocument()
   })
 })

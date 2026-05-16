@@ -23,6 +23,15 @@
   border-radius: 12px;
 }
 
+.calc-add-room-button {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
 .calc-room-detail-list {
   margin-left: 0;
   margin-right: 0;
