@@ -7,12 +7,12 @@ import {
   Card,
   CardContent,
   CardHeader,
-  Chip,
   Link,
   List,
   ListInput,
   ListItem,
-  PageContent,
+  SwipeoutActions,
+  SwipeoutButton,
   Tab,
   Tabs,
   Toolbar,
@@ -210,9 +210,8 @@ export default function Calculator() {
 
   return (
     <>
-      <PageContent>
-        <Tabs animated swipeable>
-          <Tab id="tab-calc" tabActive>
+      <Tabs animated swipeable>
+          <Tab id="tab-calc" tabActive className="page-content">
             <List className="list-strong list-dividers inset-ios no-hairlines margin-top margin-horizontal margin-bottom">
                   <ListItem accordionItem title="Rooms">
                     <AccordionContent>
@@ -252,19 +251,42 @@ export default function Calculator() {
                           <span slot="after" className="text-color-black">{formatArea(roomsTotalArea)}</span>
                         </ListItem>
                         <ListItem title="Rooms">
-                          <div slot="after" className="display-flex align-items-center flex-shrink-1">
-                            {parsedRooms.map((area, index) => (
-                              <Chip
-                                key={`${area}-${index}`}
-                                text={`${area} m²`}
-                                deleteable
-                                onDelete={() => {
-                                  const next = parsedRooms.filter((_, i) => i !== index)
-                                  setRoomsText(next.join(', '))
-                                }}
-                              />
-                            ))}
-                          </div>
+                          {parsedRooms.length === 0 ? (
+                            <div slot="after" className="text-color-gray">
+                              No rooms yet
+                            </div>
+                          ) : (
+                            <List
+                              className="media-list no-margin-top no-margin-bottom width-100"
+                              inset
+                              noHairlinesBetween
+                            >
+                              {parsedRooms.map((area, index) => {
+                                const areaShare = roomsTotalArea > 0 ? (area / roomsTotalArea) * 100 : 0
+                                return (
+                                  <ListItem
+                                    key={`${area}-${index}`}
+                                    swipeout
+                                    title={`Room ${index + 1}`}
+                                    subtitle={formatArea(area)}
+                                    after={formatPercent(areaShare)}
+                                  >
+                                    <SwipeoutActions right>
+                                      <SwipeoutButton
+                                        delete
+                                        onClick={() => {
+                                          const next = parsedRooms.filter((_, i) => i !== index)
+                                          setRoomsText(next.join(', '))
+                                        }}
+                                      >
+                                        Delete
+                                      </SwipeoutButton>
+                                    </SwipeoutActions>
+                                  </ListItem>
+                                )
+                              })}
+                            </List>
+                          )}
                         </ListItem>
                         {roomsError && (
                           <ListItem title={roomsError}>
@@ -361,7 +383,7 @@ export default function Calculator() {
                 </List>
           </Tab>
 
-          <Tab id="tab-result">
+          <Tab id="tab-result" className="page-content">
             <div className="margin-top margin-horizontal margin-bottom">
               {formStatusMessage && (
                 <List>
@@ -448,7 +470,6 @@ export default function Calculator() {
             </div>
           </Tab>
         </Tabs>
-      </PageContent>
 
       <Toolbar tabbar labels bottom>
         <Link tabLink={CALC_TAB} tabLinkActive>
