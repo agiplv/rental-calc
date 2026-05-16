@@ -118,6 +118,7 @@ vi.mock('framework7-react', () => {
         {children}
       </div>
     ),
+    PageContent: wrap('div'),
     Tab: ({ children, id, tabActive, className, onTabShow }) => {
       const { activeTab } = useTabState()
       const isActive = tabActive || activeTab === `#${id}`
