@@ -116,6 +116,8 @@ describe('Calculator', () => {
     expect(inputsTab).not.toHaveClass('tab-active')
     expect(resultsTab).toHaveClass('tab-active')
     expect(screen.getByText('Details')).toBeInTheDocument()
+    expect(screen.getByText('Summary')).toBeInTheDocument()
+    expect(screen.getAllByText('Total due').length).toBeGreaterThan(0)
   })
 
   it('restores saved room data from localStorage', async () => {

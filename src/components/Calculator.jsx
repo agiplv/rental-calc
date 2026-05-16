@@ -36,6 +36,11 @@ function formatPercent(value) {
   return `${Number(value).toFixed(1)}%`
 }
 
+function formatRate(value) {
+  if (!Number.isFinite(value)) return 'N/A'
+  return formatMoney(value, '€/m²')
+}
+
 function parseRooms(text) {
   if (!text) return []
   return text
@@ -404,18 +409,18 @@ export default function Calculator() {
                 </ListItem>
               </List>
 
-              <BlockTitle medium>Per-room details</BlockTitle>
+              <BlockTitle medium>Per-room detail</BlockTitle>
               <List className="list-strong list-dividers media-list">
                 {result.rows.map(row => {
                   const areaShare = result.roomsTotalArea > 0 ? (row.area / result.roomsTotalArea) * 100 : 0
-                  const roomRate = row.area > 0 ? row.total / row.area : 0
+                  const totalRatePerSqM = row.area > 0 ? row.total / row.area : null
 
                   return (
                     <ListItem
                       accordionItem
                       key={row.index}
                       after={formatMoney(row.total)}
-                      footer={`${formatMoney(row.rent)} rent + ${formatMoney(row.fee)} fees`}
+                      footer={`${formatRate(totalRatePerSqM)} total rate`}
                       subtitle={`${formatArea(row.area)} · ${formatPercent(areaShare)} of total area`}
                       title={`Room ${row.index}`}
                     >
@@ -430,11 +435,8 @@ export default function Calculator() {
                           <ListItem title="Fees portion">
                             <span slot="after" className="text-color-black">{formatMoney(row.fee)}</span>
                           </ListItem>
-                          <ListItem title="Total due">
-                            <span slot="after" className="text-color-black font-weight-bold">{formatMoney(row.total)}</span>
-                          </ListItem>
                           <ListItem title="Rate">
-                            <span slot="after" className="text-color-black">{formatMoney(roomRate, '€/m²')}</span>
+                            <span slot="after" className="text-color-black">{formatRate(totalRatePerSqM)}</span>
                           </ListItem>
                           <ListItem title="Share of total area">
                             <span slot="after" className="text-color-black">{formatPercent(areaShare)}</span>
