@@ -10,6 +10,7 @@ vi.mock('framework7-react', () => {
     'clearButton',
     'deleteable',
     'fill',
+    'inset',
     'labels',
     'large',
     'mediaList',

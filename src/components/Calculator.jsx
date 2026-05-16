@@ -11,7 +11,6 @@ import {
   List,
   ListInput,
   ListItem,
-  PageContent,
   SwipeoutActions,
   SwipeoutButton,
   Tab,
@@ -211,9 +210,8 @@ export default function Calculator() {
 
   return (
     <>
-      <PageContent>
-        <Tabs animated swipeable>
-          <Tab id="tab-calc" tabActive>
+      <Tabs animated swipeable>
+          <Tab id="tab-calc" tabActive className="page-content">
             <List className="list-strong list-dividers inset-ios no-hairlines margin-top margin-horizontal margin-bottom">
                   <ListItem accordionItem title="Rooms">
                     <AccordionContent>
@@ -385,7 +383,7 @@ export default function Calculator() {
                 </List>
           </Tab>
 
-          <Tab id="tab-result">
+          <Tab id="tab-result" className="page-content">
             <div className="margin-top margin-horizontal margin-bottom">
               {formStatusMessage && (
                 <List>
@@ -472,7 +470,6 @@ export default function Calculator() {
             </div>
           </Tab>
         </Tabs>
-      </PageContent>
 
       <Toolbar tabbar labels bottom>
         <Link tabLink={CALC_TAB} tabLinkActive>
