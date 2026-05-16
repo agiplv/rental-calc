@@ -4,15 +4,18 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('framework7-react', () => {
   const frameworkSpecificProps = new Set([
+    'animated',
     'accordionItem',
     'bottom',
     'clearButton',
     'deleteable',
     'fill',
+    'labels',
     'large',
     'mediaList',
     'noMarginBottom',
     'noMarginTop',
+    'position',
     'small',
     'swipeable',
     'tabbar',
@@ -35,7 +38,24 @@ vi.mock('framework7-react', () => {
     return Wrapped
   }
 
-  const TabContext = React.createContext({ activeTab: null, setActiveTab: () => {} })
+  let currentTab = '#tab-calc'
+  const tabSubscribers = new Set()
+
+  const setCurrentTab = tab => {
+    currentTab = tab
+    tabSubscribers.forEach(notify => notify(tab))
+  }
+
+  const useTabState = () => {
+    const [activeTab, setActiveTab] = React.useState(currentTab)
+
+    React.useEffect(() => {
+      tabSubscribers.add(setActiveTab)
+      return () => tabSubscribers.delete(setActiveTab)
+    }, [])
+
+    return { activeTab, setActiveTab: setCurrentTab }
+  }
 
   return {
     AccordionContent: ({ children }) => <Fragment>{children}</Fragment>,
@@ -52,7 +72,7 @@ vi.mock('framework7-react', () => {
     CardHeader: wrap('div'),
     Chip: ({ text }) => <span>{text}</span>,
     Link: ({ children, onClick, tabLink, tabLinkActive, ...props }) => {
-      const { setActiveTab } = React.useContext(TabContext)
+      const { setActiveTab } = useTabState()
       return (
         <button
           type="button"
@@ -95,7 +115,7 @@ vi.mock('framework7-react', () => {
       </div>
     ),
     Tab: ({ children, id, tabActive, className }) => {
-      const { activeTab } = React.useContext(TabContext)
+      const { activeTab } = useTabState()
       const isActive = tabActive || activeTab === `#${id}`
       return (
         <div id={id} className={`tab ${className || ''} ${isActive ? 'tab-active' : ''}`.trim()}>
@@ -103,14 +123,7 @@ vi.mock('framework7-react', () => {
         </div>
       )
     },
-    Tabs: ({ children, ...props }) => {
-      const [activeTab, setActiveTab] = React.useState('#tab-calc')
-      return (
-        <TabContext.Provider value={{ activeTab, setActiveTab }}>
-          <div {...cleanProps(props)}>{children}</div>
-        </TabContext.Provider>
-      )
-    },
+    Tabs: ({ children, ...props }) => <div {...cleanProps(props)}>{children}</div>,
     Toolbar: wrap('div'),
   }
 })
