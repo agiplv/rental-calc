@@ -74,6 +74,13 @@
   gap: 6px;
   overflow-x: auto;
   max-width: calc(100% - 90px);
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.calc-room-chips::-webkit-scrollbar {
+  height: 0;
+  display: none;
 }
 
 .calc-room-chips .chip {
@@ -88,6 +95,35 @@
   border-radius: 8px;
   border: 1px solid var(--f7-list-item-divider-bg-color);
   font-size: 14px;
+}
+
+.calc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--f7-card-background-color, #f0f0f0);
+  padding: 6px 8px;
+  border-radius: 12px;
+}
+
+.calc-chip-text {
+  font-size: 13px;
+  color: var(--f7-text-color);
+}
+
+.calc-chip-close {
+  background: transparent;
+  border: none;
+  color: var(--f7-text-color);
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 6px;
+  cursor: pointer;
+}
+
+.calc-chip-close:focus {
+  outline: 2px solid rgba(0,0,0,0.12);
+  border-radius: 8px;
 }
 
 .calc-helper-text {
