@@ -12,6 +12,7 @@ import {
   List,
   ListInput,
   ListItem,
+  PageContent,
   Tab,
   Tabs,
   Toolbar,
@@ -209,18 +210,7 @@ export default function Calculator() {
 
   return (
     <>
-      <Toolbar tabbar labels bottom>
-        <Link tabLink={CALC_TAB} tabLinkActive>
-          <i className="icon f7-icons" aria-hidden="true">slider_horizontal_3</i>
-          <span>Calc</span>
-        </Link>
-        <Link tabLink={RESULT_TAB}>
-          <i className="icon f7-icons" aria-hidden="true">chart_bar_fill</i>
-          <span>Result</span>
-        </Link>
-      </Toolbar>
-
-      <div className="page-content">
+      <PageContent>
         <Tabs animated swipeable>
           <Tab id="tab-calc" tabActive>
             <List className="list-strong list-dividers inset-ios no-hairlines margin-top margin-horizontal margin-bottom">
@@ -458,7 +448,18 @@ export default function Calculator() {
             </div>
           </Tab>
         </Tabs>
-      </div>
+      </PageContent>
+
+      <Toolbar tabbar labels bottom>
+        <Link tabLink={CALC_TAB} tabLinkActive>
+          <i className="icon f7-icons" aria-hidden="true">slider_horizontal_3</i>
+          <span>Calc</span>
+        </Link>
+        <Link tabLink={RESULT_TAB}>
+          <i className="icon f7-icons" aria-hidden="true">chart_bar_fill</i>
+          <span>Result</span>
+        </Link>
+      </Toolbar>
     </>
   )
 }
