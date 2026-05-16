@@ -115,7 +115,7 @@ describe('Calculator', () => {
 
     expect(inputsTab).not.toHaveClass('tab-active')
     expect(resultsTab).toHaveClass('tab-active')
-    expect(screen.getByText('Monthly summary')).toBeInTheDocument()
+    expect(screen.getByText('Details')).toBeInTheDocument()
   })
 
   it('restores saved room data from localStorage', async () => {

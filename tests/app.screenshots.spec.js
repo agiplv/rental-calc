@@ -12,7 +12,7 @@ test('captures the main calculator flow in iOS mode', async ({ page }, testInfo)
 
   await page.getByText('Results').first().click()
 
-  await expect(page.getByText('Monthly summary')).toBeVisible()
+  await expect(page.getByText('Details')).toBeVisible()
 
   await testInfo.attach('results-view', {
     body: await page.screenshot({ fullPage: true }),
