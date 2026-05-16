@@ -3,6 +3,8 @@ import {
   AccordionItem,
   AccordionContent,
   AccordionToggle,
+  Block,
+  BlockTitle,
   Button,
   Card,
   CardContent,
@@ -213,7 +215,7 @@ export default function Calculator() {
       <Tabs animated swipeable>
           <Tab id="tab-calc" tabActive className="page-content">
             <List className="list-strong list-dividers inset-ios no-hairlines margin-top margin-horizontal margin-bottom">
-                  <ListItem accordionItem title="Rooms">
+                  <ListItem accordionItem title={`Rooms${parsedRooms.length > 0 ? ` (${parsedRooms.length})` : ''}`}>
                     <AccordionContent>
                       <List className="list-strong list-dividers inset-ios no-margin-top no-margin-bottom">
                         <ListInput
@@ -239,61 +241,55 @@ export default function Calculator() {
                           <Button
                             fill
                             large
-                            className="width-100 display-flex justify-content-center align-items-center"
+                            className="width-100 display-flex justify-content-center align-items-center gap-8px"
                             disabled={!canAddRoom}
                             onClick={addRoomFromInput}
                           >
-                            <i className="icon f7-icons">plus_circle_fill</i>
+                            <i className="icon f7-icons" style={{ marginRight: 6 }}>plus_circle_fill</i>
                             <span>Add room</span>
                           </Button>
                         </ListItem>
                         <ListItem title="Total area">
                           <span slot="after" className="text-color-black">{formatArea(roomsTotalArea)}</span>
                         </ListItem>
-                        <ListItem title="Rooms">
-                          {parsedRooms.length === 0 ? (
-                            <div slot="after" className="text-color-gray">
-                              No rooms yet
-                            </div>
-                          ) : (
-                            <List
-                              className="media-list no-margin-top no-margin-bottom width-100"
-                              inset
-                              noHairlinesBetween
-                            >
-                              {parsedRooms.map((area, index) => {
-                                const areaShare = roomsTotalArea > 0 ? (area / roomsTotalArea) * 100 : 0
-                                return (
-                                  <ListItem
-                                    key={`${area}-${index}`}
-                                    swipeout
-                                    title={`Room ${index + 1}`}
-                                    subtitle={formatArea(area)}
-                                    after={formatPercent(areaShare)}
-                                  >
-                                    <SwipeoutActions right>
-                                      <SwipeoutButton
-                                        delete
-                                        onClick={() => {
-                                          const next = parsedRooms.filter((_, i) => i !== index)
-                                          setRoomsText(next.join(', '))
-                                        }}
-                                      >
-                                        Delete
-                                      </SwipeoutButton>
-                                    </SwipeoutActions>
-                                  </ListItem>
-                                )
-                              })}
-                            </List>
-                          )}
-                        </ListItem>
-                        {roomsError && (
-                          <ListItem title={roomsError}>
-                            <span slot="after" className="text-color-red">!</span>
-                          </ListItem>
-                        )}
                       </List>
+                      {parsedRooms.length === 0 ? (
+                        <Block>
+                          <p className="text-color-gray text-align-center no-margin-top">No rooms yet</p>
+                        </Block>
+                      ) : (
+                        <List className="list-strong list-dividers inset-ios no-margin-top no-margin-bottom" mediaList noHairlinesBetween>
+                          {parsedRooms.map((area, index) => {
+                            const areaShare = roomsTotalArea > 0 ? (area / roomsTotalArea) * 100 : 0
+                            return (
+                              <ListItem
+                                key={`${area}-${index}`}
+                                swipeout
+                                title={`Room ${index + 1}`}
+                                subtitle={formatArea(area)}
+                                after={formatPercent(areaShare)}
+                              >
+                                <SwipeoutActions right>
+                                  <SwipeoutButton
+                                    delete
+                                    onClick={() => {
+                                      const next = parsedRooms.filter((_, i) => i !== index)
+                                      setRoomsText(next.join(', '))
+                                    }}
+                                  >
+                                    Delete
+                                  </SwipeoutButton>
+                                </SwipeoutActions>
+                              </ListItem>
+                            )
+                          })}
+                        </List>
+                      )}
+                      {roomsError && (
+                        <Block strong inset className="no-margin-top">
+                          <p className="text-color-red no-margin">{roomsError}</p>
+                        </Block>
+                      )}
                     </AccordionContent>
                   </ListItem>
                   <ListItem accordionItem title="Costs and taxes">
@@ -366,17 +362,16 @@ export default function Calculator() {
                           <span slot="after">€</span>
                         </ListInput>
                         <ListInput
-                          clearButton
-                          inputmode="decimal"
-                          label="Size weighting"
-                          placeholder="0"
-                          type="number"
-                          value={sizeWeight}
-                          onInput={event => setSizeWeight(event.target.value)}
-                          inputProps={{ min: '0', max: '10', step: '0.01' }}
-                        >
-                          <span slot="after">k</span>
-                        </ListInput>
+                           clearButton
+                           inputmode="decimal"
+                           label="Size weighting"
+                           info="0 = equal €/m²; higher values increase rent for smaller rooms"
+                           placeholder="0"
+                           type="number"
+                           value={sizeWeight}
+                           onInput={event => setSizeWeight(event.target.value)}
+                           inputProps={{ min: '0', max: '10', step: '0.01' }}
+                         />
                       </List>
                     </AccordionContent>
                   </ListItem>
@@ -386,20 +381,16 @@ export default function Calculator() {
           <Tab id="tab-result" className="page-content">
             <div className="margin-top margin-horizontal margin-bottom">
               {formStatusMessage && (
-                <List>
-                  <ListItem title="Check your inputs">
-                    <span slot="after" className="text-color-red">{formStatusMessage}</span>
-                  </ListItem>
-                </List>
+                <Block strong inset className="margin-top">
+                  <p className="text-color-red">{formStatusMessage}</p>
+                </Block>
               )}
 
               {!formStatusMessage && !result && (
-                <List>
-                  <ListItem
-                    footer="Enter at least one valid room area to see your pricing breakdown."
-                    title="No pricing yet"
-                  />
-                </List>
+                <Block strong inset className="margin-top text-align-center">
+                  <p>No pricing yet</p>
+                  <p className="text-color-gray">Enter at least one valid room area on the <strong>Calc</strong> tab to see your pricing breakdown.</p>
+                </Block>
               )}
 
               {result && (
@@ -414,7 +405,7 @@ export default function Calculator() {
                     >
                       <AccordionContent>
                         <List>
-                          <ListItem title="Total due" after={formatMoney(result.totalMonthlyIncomeBeforeTax)} />
+                          <ListItem title="Gross income" after={formatMoney(result.totalMonthlyIncomeBeforeTax)} />
                           <ListItem title="Net profit" after={formatMoney(result.netProfit)} />
                           <ListItem title="Target profit" after={formatMoney(result.monthlyTargetProfit)} />
                           <ListItem title="Rent price" after={formatMoney(result.pricePerSqM, '€/m²')} />
@@ -427,6 +418,8 @@ export default function Calculator() {
                     </ListItem>
                   </List>
 
+                  <BlockTitle medium>Per-room breakdown</BlockTitle>
+
                   {result.rows.map(row => {
                     const areaShare = result.roomsTotalArea > 0 ? (row.area / result.roomsTotalArea) * 100 : 0
                     const totalRatePerSqM = row.area > 0 ? row.total / row.area : null
@@ -435,18 +428,18 @@ export default function Calculator() {
                       <AccordionItem key={row.index}>
                         <Card className="no-margin-bottom margin-top-half">
                           <AccordionToggle>
-                            <CardHeader className="display-flex justify-content-space-between align-items-flex-start">
-                              <div className="min-width-0">
+                            <CardHeader className="display-flex justify-content-space-between align-items-center no-padding-right">
+                              <div className="min-width-0" style={{ flex: 1, overflow: 'hidden' }}>
                                 <div className="font-weight-semibold">{`Room ${row.index}`}</div>
                                 <div className="text-color-gray text-small">
-                                  {`${formatArea(row.area)} · ${formatPercent(areaShare)} of total area`}
+                                  {`${formatArea(row.area)} · ${formatPercent(areaShare)}`}
                                 </div>
                               </div>
-                              <div className="display-flex align-items-center">
-                                <span className="text-color-black font-weight-semibold margin-right-half">
+                              <div className="display-flex align-items-center" style={{ flexShrink: 0, paddingLeft: 8, paddingRight: 12 }}>
+                                <span className="text-color-black font-weight-semibold" style={{ marginRight: 4 }}>
                                   {formatMoney(row.total)}
                                 </span>
-                                <i className="icon f7-icons text-color-gray" aria-hidden="true">chevron_down</i>
+                                <i className="icon f7-icons text-color-gray accordion-item-toggle-icon" aria-hidden="true">chevron_down</i>
                               </div>
                             </CardHeader>
                           </AccordionToggle>

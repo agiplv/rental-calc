@@ -1,0 +1,8 @@
+/* Rotate chevron icon when accordion card is open */
+.accordion-item-opened .accordion-item-toggle-icon {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
+}
+.accordion-item-toggle-icon {
+  transition: transform 0.3s ease;
+}
