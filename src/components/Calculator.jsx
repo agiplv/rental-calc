@@ -187,57 +187,28 @@ export default function Calculator() {
         <Tab id="tab-inputs" tabActive={activeTab === 'inputs'} className="page-content calc-shell">
 
           <BlockHeader medium>Rooms</BlockHeader>
-          <Block strong inset>
-            <div className="calc-room-chips">
+          <Block strong inset className="calc-room-block">
+            <div className="calc-room-input-row">
+              <div className="calc-room-chips">
                 {parsedRooms.map((area, index) => (
                   <Chip
                     key={`${area}-${index}`}
                     text={`${area} m²`}
-                    close
-                    onClose={() => {
+                    deleteable
+                    onDelete={() => {
                       const next = parsedRooms.filter((_, i) => i !== index)
                       setRoomsText(next.join(', '))
                     }}
                   />
                 ))}
-                </div>
-
-                <input
-                  className="calc-room-add-input"
-                  aria-label="Add room size"
-                  placeholder="Add"
-                  value={newRoomText}
-                  onChange={e => setNewRoomText(e.target.value)}
-                  onKeyDown={event => {
-                    if (event.key === 'Enter' || event.key === ',') {
-                      event.preventDefault()
-                      const normalized = (newRoomText || '').replace(/[^0-9.]/g, '').trim()
-                      const val = Number(normalized)
-                      if (Number.isFinite(val) && val > 0) {
-                        const next = parsedRooms.concat(val)
-                        setRoomsText(next.join(', '))
-                        setNewRoomText('')
-                      }
-                    }
-                  }}
-                />
               </div>
-              {roomsError ? (
-                <div className="calc-helper-text text-color-red">{roomsError}</div>
-              ) : (
-                <div className="calc-helper-text">Tap × to remove, press Enter to add.</div>
-              )}
-            </Block>
-            </div>
 
-            <List inset>
-              <ListInput
-                clearButton
-                label="Add room"
-                placeholder="Type size and press Enter"
-                type="text"
+              <input
+                className="calc-room-add-input"
+                aria-label="Add room size"
+                placeholder="Add"
                 value={newRoomText}
-                onInput={event => setNewRoomText(event.target.value)}
+                onChange={e => setNewRoomText(e.target.value)}
                 onKeyDown={event => {
                   if (event.key === 'Enter' || event.key === ',') {
                     event.preventDefault()
@@ -251,11 +222,11 @@ export default function Calculator() {
                   }
                 }}
               />
-            </List>
+            </div>
             {roomsError ? (
               <div className="calc-helper-text text-color-red">{roomsError}</div>
             ) : (
-              <div className="calc-helper-text">Use commas, semicolons, or press Enter to add.</div>
+              <div className="calc-helper-text">Tap × to remove, press Enter to add.</div>
             )}
           </Block>
 
