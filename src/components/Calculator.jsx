@@ -202,8 +202,8 @@ export default function Calculator() {
             <ListInput
               clearButton
               inputmode="decimal"
-              label="Add room area"
-              placeholder="Add room area"
+              label="New room area (m²)"
+              placeholder="e.g. 12.5"
               type="number"
               value={newRoomText}
               onInput={event => setNewRoomText(event.target.value)}
@@ -219,9 +219,13 @@ export default function Calculator() {
               }}
             >
               <Button slot="after" small onClick={addRoomFromInput}>
-                Add
+                Add room
               </Button>
             </ListInput>
+            <ListItem
+              title="How to add rooms"
+              footer="Enter a room size and tap Add room (or press Enter). Repeat for each room."
+            />
             <ListItem title="Total area">
               <span slot="after" className="text-color-black">{formatArea(roomsTotalArea)}</span>
             </ListItem>
@@ -381,7 +385,7 @@ export default function Calculator() {
               </List>
 
               <BlockTitle medium>Per-room detail</BlockTitle>
-              <List className="list-strong list-dividers inset-ios media-list">
+              <List className="list-strong list-dividers media-list calc-room-detail-list">
                 {result.rows.map(row => {
                   const areaShare = result.roomsTotalArea > 0 ? (row.area / result.roomsTotalArea) * 100 : 0
 

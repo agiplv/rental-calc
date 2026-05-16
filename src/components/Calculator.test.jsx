@@ -153,4 +153,14 @@ describe('Calculator', () => {
     fireEvent.click(screen.getByRole('button', { name: /results/i }))
     expect(screen.getByText('Check your inputs')).toBeInTheDocument()
   })
+
+  it('shows room add guidance and appends a new room from input', () => {
+    render(<Calculator />)
+
+    expect(screen.getByText('How to add rooms')).toBeInTheDocument()
+    fireEvent.input(screen.getByLabelText('New room area (m²)'), { target: { value: '22' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Add room' }))
+
+    expect(screen.getByText('22 m²')).toBeInTheDocument()
+  })
 })
