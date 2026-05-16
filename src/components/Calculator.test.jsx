@@ -70,6 +70,7 @@ vi.mock('framework7-react', () => {
     AccordionContent: ({ children }) => <Fragment>{children}</Fragment>,
     AccordionItem: wrap('div'),
     AccordionToggle: ({ children, ...props }) => <div {...cleanProps(props)}>{children}</div>,
+    Block: wrap('div'),
     BlockTitle: ({ children }) => <h2>{children}</h2>,
     Button: ({ children, onClick, type = 'button', ...props }) => (
       <button type={type} onClick={onClick} {...cleanProps(props)}>
@@ -175,7 +176,7 @@ describe('Calculator', () => {
     expect(screen.getByRole('button', { name: 'Result' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Result' }))
     expect(screen.getByText('Summary')).toBeInTheDocument()
-    expect(screen.getAllByText('Total due').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Gross income').length).toBeGreaterThan(0)
   })
 
   it('restores saved room data from localStorage', async () => {
@@ -213,7 +214,7 @@ describe('Calculator', () => {
     })
 
     fireEvent.click(screen.getByRole('button', { name: 'Result' }))
-    expect(screen.getByText('Check your inputs')).toBeInTheDocument()
+    expect(screen.getByText('Tax must stay between 0% and 99.99%.')).toBeInTheDocument()
   })
 
   it('disables add-room button for invalid input and appends a new room for valid input', async () => {
