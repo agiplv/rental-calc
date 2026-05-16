@@ -322,14 +322,14 @@ export default function Calculator() {
                       : 'Increase rent or lower costs to reach the requested monthly return.'
                   }
                 />
-                <ListItem
-                  title="KPIs"
-                  subtitle={`Net: ${formatMoney(result.netProfit)} · Target: ${formatMoney(
-                    result.monthlyTargetProfit
-                  )} · Rent: ${formatMoney(result.pricePerSqM, '€/m²')} · Due: ${formatMoney(
-                    result.totalMonthlyIncomeBeforeTax
-                  )}`}
-                />
+                <ListItem>
+                  <div className="calc-kpi-inline">
+                    <Chip className="calc-kpi-chip" text={`Net ${formatMoney(result.netProfit)}`} />
+                    <Chip className="calc-kpi-chip" text={`Target ${formatMoney(result.monthlyTargetProfit)}`} />
+                    <Chip className="calc-kpi-chip" text={`Rent ${formatMoney(result.pricePerSqM, '€/m²')}`} />
+                    <Chip className="calc-kpi-chip" text={`Due ${formatMoney(result.totalMonthlyIncomeBeforeTax)}`} />
+                  </div>
+                </ListItem>
                 <ListItem title="Total area" after={formatArea(result.roomsTotalArea)} />
                 <ListItem title="Monthly fees" after={formatMoney(result.totalFees)} />
                 <ListItem title="Tax paid" after={formatMoney(result.totalTaxPaid)} />
