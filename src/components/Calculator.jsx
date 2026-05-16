@@ -192,7 +192,7 @@ export default function Calculator() {
               errorMessage={roomsError}
               errorMessageForce={Boolean(roomsError)}
               info="Use commas, semicolons, or line breaks."
-              inputProps={{ rows: 3 }}
+              inputProps={{ rows: 1 }}
               label="Room areas"
               placeholder="48, 34, 14, 10"
               type="textarea"
