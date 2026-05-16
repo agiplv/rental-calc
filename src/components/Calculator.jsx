@@ -101,7 +101,6 @@ export default function Calculator() {
   const [result, setResult] = useState(null)
   const [roomsError, setRoomsError] = useState('')
   const [validationError, setValidationError] = useState('')
-  const [activeTab, setActiveTab] = useState(CALC_TAB)
   const debounceRef = useRef(null)
 
   const parsedRooms = useMemo(() => parseRooms(roomsText), [roomsText])
@@ -210,21 +209,21 @@ export default function Calculator() {
 
   return (
     <>
-      <Toolbar tabbar position="bottom">
-        <Link tabLink={CALC_TAB} tabLinkActive={activeTab === CALC_TAB} onClick={() => setActiveTab(CALC_TAB)}>
-          Calc
+      <Toolbar tabbar labels position="bottom">
+        <Link tabLink={CALC_TAB} tabLinkActive>
+          <i className="icon f7-icons" aria-hidden="true">slider_horizontal_3</i>
+          <span>Calc</span>
         </Link>
-        <Link tabLink={RESULT_TAB} tabLinkActive={activeTab === RESULT_TAB} onClick={() => setActiveTab(RESULT_TAB)}>
-          Result
+        <Link tabLink={RESULT_TAB}>
+          <i className="icon f7-icons" aria-hidden="true">chart_bar_fill</i>
+          <span>Result</span>
         </Link>
       </Toolbar>
 
       <div className="page-content">
         <Tabs swipeable>
-          <Tab id="tab-calc" tabActive={activeTab === CALC_TAB} onTabShow={() => setActiveTab(CALC_TAB)}>
-            <Card className="margin-top margin-horizontal margin-bottom">
-              <CardContent>
-                <List className="list-strong list-dividers inset-ios no-hairlines">
+          <Tab id="tab-calc" tabActive>
+            <List className="list-strong list-dividers inset-ios no-hairlines margin-top margin-horizontal margin-bottom">
                   <ListItem accordionItem title="Rooms">
                     <AccordionContent>
                       <List className="list-strong list-dividers inset-ios no-margin-top no-margin-bottom">
@@ -370,123 +369,119 @@ export default function Calculator() {
                     </AccordionContent>
                   </ListItem>
                 </List>
-              </CardContent>
-            </Card>
           </Tab>
 
-          <Tab id="tab-result" tabActive={activeTab === RESULT_TAB} onTabShow={() => setActiveTab(RESULT_TAB)}>
-            <Card className="margin-top margin-horizontal margin-bottom">
-              <CardContent>
-                {formStatusMessage && (
-                  <List className="list-strong list-dividers inset-ios no-hairlines">
-                    <ListItem title="Check your inputs">
-                      <span slot="after" className="text-color-red">{formStatusMessage}</span>
-                    </ListItem>
-                  </List>
-                )}
+          <Tab id="tab-result">
+            <div className="margin-top margin-horizontal margin-bottom">
+              {formStatusMessage && (
+                <List className="list-strong list-dividers inset-ios no-hairlines">
+                  <ListItem title="Check your inputs">
+                    <span slot="after" className="text-color-red">{formStatusMessage}</span>
+                  </ListItem>
+                </List>
+              )}
 
-                {!formStatusMessage && !result && (
+              {!formStatusMessage && !result && (
+                <List className="list-strong list-dividers inset-ios no-hairlines">
+                  <ListItem
+                    footer="Enter at least one valid room area to see your pricing breakdown."
+                    title="No pricing yet"
+                  />
+                </List>
+              )}
+
+              {result && (
+                <>
                   <List className="list-strong list-dividers inset-ios no-hairlines">
                     <ListItem
-                      footer="Enter at least one valid room area to see your pricing breakdown."
-                      title="No pricing yet"
-                    />
+                      accordionItem
+                      title="Summary"
+                      after={formatMoney(result.totalMonthlyIncomeBeforeTax)}
+                      subtitle={`${formatMoney(result.netProfit)} net profit`}
+                      footer={`${formatMoney(result.pricePerSqM, '€/m²')} rent price`}
+                    >
+                      <AccordionContent>
+                        <List className="list-strong list-dividers inset-ios no-margin-top no-margin-bottom">
+                          <ListItem title="Total due">
+                            <span slot="after" className="text-color-black font-weight-bold">{formatMoney(result.totalMonthlyIncomeBeforeTax)}</span>
+                          </ListItem>
+                          <ListItem title="Net profit">
+                            <span slot="after" className="text-color-black">{formatMoney(result.netProfit)}</span>
+                          </ListItem>
+                          <ListItem title="Target profit">
+                            <span slot="after" className="text-color-black">{formatMoney(result.monthlyTargetProfit)}</span>
+                          </ListItem>
+                          <ListItem title="Rent price">
+                            <span slot="after" className="text-color-black">{formatMoney(result.pricePerSqM, '€/m²')}</span>
+                          </ListItem>
+                          <ListItem title="Total area">
+                            <span slot="after" className="text-color-black">{formatArea(result.roomsTotalArea)}</span>
+                          </ListItem>
+                          <ListItem title="Monthly fees">
+                            <span slot="after" className="text-color-black">{formatMoney(result.totalFees)}</span>
+                          </ListItem>
+                          <ListItem title="Tax paid">
+                            <span slot="after" className="text-color-black">{formatMoney(result.totalTaxPaid)}</span>
+                          </ListItem>
+                          <ListItem title="Fees per m²">
+                            <span slot="after" className="text-color-black">{formatMoney(result.monthlyFeePerSqM, '€/m²')}</span>
+                          </ListItem>
+                        </List>
+                      </AccordionContent>
+                    </ListItem>
                   </List>
-                )}
 
-                {result && (
-                  <>
-                    <List className="list-strong list-dividers inset-ios no-hairlines">
-                      <ListItem
-                        accordionItem
-                        title="Summary"
-                        after={formatMoney(result.totalMonthlyIncomeBeforeTax)}
-                        subtitle={`${formatMoney(result.netProfit)} net profit`}
-                        footer={`${formatMoney(result.pricePerSqM, '€/m²')} rent price`}
-                      >
-                        <AccordionContent>
-                          <List className="list-strong list-dividers inset-ios no-margin-top no-margin-bottom">
-                            <ListItem title="Total due">
-                              <span slot="after" className="text-color-black font-weight-bold">{formatMoney(result.totalMonthlyIncomeBeforeTax)}</span>
-                            </ListItem>
-                            <ListItem title="Net profit">
-                              <span slot="after" className="text-color-black">{formatMoney(result.netProfit)}</span>
-                            </ListItem>
-                            <ListItem title="Target profit">
-                              <span slot="after" className="text-color-black">{formatMoney(result.monthlyTargetProfit)}</span>
-                            </ListItem>
-                            <ListItem title="Rent price">
-                              <span slot="after" className="text-color-black">{formatMoney(result.pricePerSqM, '€/m²')}</span>
-                            </ListItem>
-                            <ListItem title="Total area">
-                              <span slot="after" className="text-color-black">{formatArea(result.roomsTotalArea)}</span>
-                            </ListItem>
-                            <ListItem title="Monthly fees">
-                              <span slot="after" className="text-color-black">{formatMoney(result.totalFees)}</span>
-                            </ListItem>
-                            <ListItem title="Tax paid">
-                              <span slot="after" className="text-color-black">{formatMoney(result.totalTaxPaid)}</span>
-                            </ListItem>
-                            <ListItem title="Fees per m²">
-                              <span slot="after" className="text-color-black">{formatMoney(result.monthlyFeePerSqM, '€/m²')}</span>
-                            </ListItem>
-                          </List>
-                        </AccordionContent>
-                      </ListItem>
-                    </List>
+                  {result.rows.map(row => {
+                    const areaShare = result.roomsTotalArea > 0 ? (row.area / result.roomsTotalArea) * 100 : 0
+                    const totalRatePerSqM = row.area > 0 ? row.total / row.area : null
 
-                    {result.rows.map(row => {
-                      const areaShare = result.roomsTotalArea > 0 ? (row.area / result.roomsTotalArea) * 100 : 0
-                      const totalRatePerSqM = row.area > 0 ? row.total / row.area : null
-
-                      return (
-                        <AccordionItem key={row.index}>
-                          <Card className="no-margin-bottom margin-top-half">
-                            <AccordionToggle>
-                              <CardHeader className="display-flex justify-content-space-between align-items-flex-start">
-                                <div className="min-width-0">
-                                  <div className="font-weight-semibold">{`Room ${row.index}`}</div>
-                                  <div className="text-color-gray text-small">
-                                    {`${formatArea(row.area)} · ${formatPercent(areaShare)} of total area`}
-                                  </div>
+                    return (
+                      <AccordionItem key={row.index}>
+                        <Card className="no-margin-bottom margin-top-half">
+                          <AccordionToggle>
+                            <CardHeader className="display-flex justify-content-space-between align-items-flex-start">
+                              <div className="min-width-0">
+                                <div className="font-weight-semibold">{`Room ${row.index}`}</div>
+                                <div className="text-color-gray text-small">
+                                  {`${formatArea(row.area)} · ${formatPercent(areaShare)} of total area`}
                                 </div>
-                                <div className="display-flex align-items-center">
-                                  <span className="text-color-black font-weight-semibold margin-right-half">
-                                    {formatMoney(row.total)}
-                                  </span>
-                                  <i className="icon f7-icons text-color-gray" aria-hidden="true">chevron_down</i>
-                                </div>
-                              </CardHeader>
-                            </AccordionToggle>
-                            <AccordionContent>
-                              <CardContent className="padding-top-half">
-                                <List className="list-strong list-dividers inset-ios no-margin-top no-margin-bottom">
-                                  <ListItem title="Area">
-                                    <span slot="after" className="text-color-black">{formatArea(row.area)}</span>
-                                  </ListItem>
-                                  <ListItem title="Rent portion">
-                                    <span slot="after" className="text-color-black">{formatMoney(row.rent)}</span>
-                                  </ListItem>
-                                  <ListItem title="Fees portion">
-                                    <span slot="after" className="text-color-black">{formatMoney(row.fee)}</span>
-                                  </ListItem>
-                                  <ListItem title="Rate">
-                                    <span slot="after" className="text-color-black">{formatRate(totalRatePerSqM)}</span>
-                                  </ListItem>
-                                  <ListItem title="Share of total area">
-                                    <span slot="after" className="text-color-black">{formatPercent(areaShare)}</span>
-                                  </ListItem>
-                                </List>
-                              </CardContent>
-                            </AccordionContent>
-                          </Card>
-                        </AccordionItem>
-                      )
-                    })}
-                  </>
-                )}
-              </CardContent>
-            </Card>
+                              </div>
+                              <div className="display-flex align-items-center">
+                                <span className="text-color-black font-weight-semibold margin-right-half">
+                                  {formatMoney(row.total)}
+                                </span>
+                                <i className="icon f7-icons text-color-gray" aria-hidden="true">chevron_down</i>
+                              </div>
+                            </CardHeader>
+                          </AccordionToggle>
+                          <AccordionContent>
+                            <CardContent className="padding-top-half">
+                              <List className="list-strong list-dividers inset-ios no-margin-top no-margin-bottom">
+                                <ListItem title="Area">
+                                  <span slot="after" className="text-color-black">{formatArea(row.area)}</span>
+                                </ListItem>
+                                <ListItem title="Rent portion">
+                                  <span slot="after" className="text-color-black">{formatMoney(row.rent)}</span>
+                                </ListItem>
+                                <ListItem title="Fees portion">
+                                  <span slot="after" className="text-color-black">{formatMoney(row.fee)}</span>
+                                </ListItem>
+                                <ListItem title="Rate">
+                                  <span slot="after" className="text-color-black">{formatRate(totalRatePerSqM)}</span>
+                                </ListItem>
+                                <ListItem title="Share of total area">
+                                  <span slot="after" className="text-color-black">{formatPercent(areaShare)}</span>
+                                </ListItem>
+                              </List>
+                            </CardContent>
+                          </AccordionContent>
+                        </Card>
+                      </AccordionItem>
+                    )
+                  })}
+                </>
+              )}
+            </div>
           </Tab>
         </Tabs>
       </div>
