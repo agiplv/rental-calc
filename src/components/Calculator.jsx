@@ -223,11 +223,7 @@ export default function Calculator() {
                 }}
               />
             </div>
-            {roomsError ? (
-              <div className="calc-helper-text text-color-red">{roomsError}</div>
-            ) : (
-              <div className="calc-helper-text">Tap × to remove, press Enter to add.</div>
-            )}
+            {roomsError && <div className="calc-helper-text text-color-red">{roomsError}</div>}
           </Block>
 
           <BlockHeader medium>Costs and taxes</BlockHeader>
@@ -294,16 +290,7 @@ export default function Calculator() {
             />
           </List>
 
-          {result && (
-            <Block strong inset>
-              <div className="calc-helper-text">
-                Ready to review a pricing recommendation for {parsedRooms.length} rooms.
-              </div>
-              <Button fill large onClick={() => setActiveTab('results')} type="button">
-                View detailed results
-              </Button>
-            </Block>
-          )}
+          {/* result preview removed — details available under Results tab */}
         </Tab>
 
         <Tab id="tab-results" tabActive={activeTab === 'results'} className="page-content calc-shell">
@@ -340,7 +327,7 @@ export default function Calculator() {
                   <div className="calc-kpi">
                     <div className="calc-kpi-label">Total due</div>
                     <div className="calc-kpi-value">{formatMoney(result.totalMonthlyIncomeBeforeTax)}</div>
-                  </div>
+                  </div>f
                 </div>
                 <div className="calc-helper-text">
                   {result.isGoalAchieved
