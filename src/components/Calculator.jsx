@@ -202,7 +202,7 @@ export default function Calculator() {
       {/* Tabs are controlled by `activeTab`; toolbar below provides quick access */}
 
       <Tabs>
-        <Tab id="tab-inputs" tabActive={activeTab === 'inputs'} className="page-content calc-shell">
+        <Tab id="tab-inputs" tabActive={activeTab === 'inputs'} className="page-content">
           <BlockTitle medium>Rooms</BlockTitle>
           <List className="list-strong list-dividers inset-ios">
             <ListInput
@@ -228,7 +228,7 @@ export default function Calculator() {
               <Button
                 fill
                 large
-                className="calc-add-room-button"
+                className="width-100 display-flex justify-content-center align-items-center"
                 disabled={!canAddRoom}
                 onClick={addRoomFromInput}
               >
@@ -240,7 +240,7 @@ export default function Calculator() {
               <span slot="after" className="text-color-black">{formatArea(roomsTotalArea)}</span>
             </ListItem>
             <ListItem title="Rooms">
-              <div slot="after" className="calc-room-chips">
+              <div slot="after" className="display-flex align-items-center flex-shrink-1">
                 {parsedRooms.map((area, index) => (
                   <Chip
                     key={`${area}-${index}`}
@@ -344,7 +344,7 @@ export default function Calculator() {
           {/* result preview removed — details available under Results tab */}
         </Tab>
 
-        <Tab id="tab-results" tabActive={activeTab === 'results'} className="page-content calc-shell padding-top">
+        <Tab id="tab-results" tabActive={activeTab === 'results'} className="page-content padding-top">
           {formStatusMessage && (
             <List className="list-strong list-dividers inset-ios">
               <ListItem title="Check your inputs">
@@ -395,7 +395,7 @@ export default function Calculator() {
               </List>
 
               <BlockTitle medium>Per-room detail</BlockTitle>
-              <List className="list-strong list-dividers media-list calc-room-detail-list">
+              <List className="list-strong list-dividers media-list">
                 {result.rows.map(row => {
                   const areaShare = result.roomsTotalArea > 0 ? (row.area / result.roomsTotalArea) * 100 : 0
 
