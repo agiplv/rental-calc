@@ -14,6 +14,7 @@ vi.mock('framework7-react', () => {
     'noMarginBottom',
     'noMarginTop',
     'small',
+    'swipeable',
     'tabbar',
     'tabLink',
     'tabActive',
@@ -82,7 +83,7 @@ vi.mock('framework7-react', () => {
     ),
     Tab: ({ children, id, tabActive, className }) => (
       <div id={id} className={`tab ${className || ''} ${tabActive ? 'tab-active' : ''}`.trim()}>
-        {tabActive ? children : null}
+        {children}
       </div>
     ),
     Tabs: wrap('div'),
@@ -103,16 +104,15 @@ describe('Calculator', () => {
     vi.useRealTimers()
   })
 
-  it('shows inputs and results content in one combined view', async () => {
+  it('shows calc/result tabs with accordion content', async () => {
     render(<Calculator />)
 
     await act(async () => {
       vi.advanceTimersByTime(350)
     })
 
-    expect(screen.getByRole('heading', { name: 'Rooms' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Results' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Details' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Calc' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Result' })).toBeInTheDocument()
     expect(screen.getByText('Summary')).toBeInTheDocument()
     expect(screen.getAllByText('Total due').length).toBeGreaterThan(0)
   })
