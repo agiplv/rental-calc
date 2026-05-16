@@ -3,62 +3,52 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('framework7-react', () => {
-  const frameworkOnlyBooleanProps = new Set([
+  const frameworkSpecificProps = new Set([
     'accordionItem',
-    'active',
+    'bottom',
     'clearButton',
-    'dividersIos',
-    'errorMessageForce',
-    'fill',
-    'inset',
-    'large',
+    'deleteable',
     'mediaList',
-    'medium',
-    'strong',
+    'noMarginBottom',
+    'noMarginTop',
+    'small',
+    'tabbar',
+    'tabLink',
+    'tabActive',
+    'tabLinkActive',
   ])
 
   const cleanProps = props =>
     Object.fromEntries(
       Object.entries(props).filter(
         ([key, value]) =>
-          value !== undefined && !(typeof value === 'boolean' && frameworkOnlyBooleanProps.has(key))
+          value !== undefined && !frameworkSpecificProps.has(key)
       )
     )
 
   const wrap = Component => {
     const Wrapped = ({ children, ...props }) => <Component {...cleanProps(props)}>{children}</Component>
-    const componentName =
-      typeof Component === 'string' ? Component : Component.displayName || Component.name || 'Component'
-    Wrapped.displayName = `Mock${componentName}`
+    Wrapped.displayName = `Mock${typeof Component === 'string' ? Component : 'Component'}`
     return Wrapped
   }
 
   return {
     AccordionContent: ({ children }) => <Fragment>{children}</Fragment>,
-    Block: wrap('section'),
-    BlockHeader: wrap('div'),
+    BlockTitle: ({ children }) => <h2>{children}</h2>,
     Button: ({ children, onClick, type = 'button', ...props }) => (
       <button type={type} onClick={onClick} {...cleanProps(props)}>
         {children}
       </button>
     ),
-    Card: wrap('article'),
-    CardContent: wrap('div'),
-    CardFooter: wrap('footer'),
-    CardHeader: wrap('header'),
     Chip: ({ text }) => <span>{text}</span>,
+    Link: ({ children, onClick, ...props }) => (
+      <button type="button" onClick={onClick} {...cleanProps(props)}>
+        {children}
+      </button>
+    ),
     List: wrap('div'),
-    ListInput: ({
-      label,
-      type,
-      value,
-      onInput,
-      placeholder,
-      inputProps = {},
-      inputmode,
-    }) => {
+    ListInput: ({ label, type, value, onInput, placeholder, inputProps = {}, inputmode, children }) => {
       const InputTag = type === 'textarea' ? 'textarea' : 'input'
-
       return (
         <label>
           <span>{label}</span>
@@ -68,8 +58,9 @@ vi.mock('framework7-react', () => {
             onInput={onInput}
             placeholder={placeholder}
             value={value}
-            {...(type === 'textarea' ? inputProps : { type })}
+            {...(type === 'textarea' ? inputProps : { type, ...inputProps })}
           />
+          {children}
         </label>
       )
     },
@@ -82,13 +73,13 @@ vi.mock('framework7-react', () => {
         {children}
       </div>
     ),
-    Segmented: wrap('div'),
     Tab: ({ children, id, tabActive, className }) => (
       <div id={id} className={`tab ${className || ''} ${tabActive ? 'tab-active' : ''}`.trim()}>
         {tabActive ? children : null}
       </div>
     ),
     Tabs: wrap('div'),
+    Toolbar: wrap('div'),
   }
 })
 
@@ -105,7 +96,7 @@ describe('Calculator', () => {
     vi.useRealTimers()
   })
 
-  it('shows a saved result and switches to the results tab from the segmented control', async () => {
+  it('shows results tab content when switching from toolbar', async () => {
     const { container } = render(<Calculator />)
 
     await act(async () => {
@@ -117,25 +108,49 @@ describe('Calculator', () => {
 
     expect(inputsTab).toHaveClass('tab-active')
     expect(resultsTab).not.toHaveClass('tab-active')
-    expect(screen.getByRole('button', { name: 'View detailed results' })).toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Results' }))
+    fireEvent.click(screen.getByRole('button', { name: /results/i }))
 
     expect(inputsTab).not.toHaveClass('tab-active')
     expect(resultsTab).toHaveClass('tab-active')
     expect(screen.getByText('Monthly summary')).toBeInTheDocument()
   })
 
-  it('switches to the results tab from the call-to-action button', async () => {
-    const { container } = render(<Calculator />)
+  it('restores saved room data from localStorage', async () => {
+    localStorage.setItem(
+      'pea-rental-calc',
+      JSON.stringify({
+        rooms: [20, 10],
+        monthlyFee: 300,
+        tax: 0.2,
+        profit: 0.1,
+        investment: 12000,
+        minProfit: 75,
+        sizeWeight: 1,
+      })
+    )
+
+    render(<Calculator />)
 
     await act(async () => {
       vi.advanceTimersByTime(350)
     })
 
-    fireEvent.click(screen.getByRole('button', { name: 'View detailed results' }))
+    expect(screen.getByText('20 m²')).toBeInTheDocument()
+    expect(screen.getByText('10 m²')).toBeInTheDocument()
+    expect(screen.getByText('30.00 m²')).toBeInTheDocument()
+  })
 
-    expect(container.querySelector('#tab-results')).toHaveClass('tab-active')
-    expect(screen.getByText('Goal achieved')).toBeInTheDocument()
+  it('shows validation feedback for invalid percentage input', async () => {
+    render(<Calculator />)
+
+    fireEvent.input(screen.getByLabelText('Tax'), { target: { value: '100' } })
+
+    await act(async () => {
+      vi.advanceTimersByTime(350)
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: /results/i }))
+    expect(screen.getByText('Check your inputs')).toBeInTheDocument()
   })
 })

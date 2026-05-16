@@ -423,7 +423,7 @@ export default function Calculator() {
         <Link
           className="display-flex flex-direction-column justify-content-center align-items-center"
           tabLink="#tab-inputs"
-          tabLinkActive
+          tabLinkActive={activeTab === 'inputs'}
           onClick={() => setActiveTab('inputs')}
         >
           <i className="icon f7-icons">square_list_fill</i>
@@ -432,6 +432,7 @@ export default function Calculator() {
         <Link
           className="display-flex flex-direction-column justify-content-center align-items-center"
           tabLink="#tab-results"
+          tabLinkActive={activeTab === 'results'}
           onClick={() => setActiveTab('results')}
         >
           <i className="icon f7-icons">chart_bar_fill</i>
