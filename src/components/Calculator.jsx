@@ -1,15 +1,20 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
   AccordionContent,
   Block,
-  BlockTitle,
-  Link,
+  BlockHeader,
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  Chip,
   List,
   ListInput,
   ListItem,
+  Segmented,
   Tab,
   Tabs,
-  Toolbar,
 } from 'framework7-react'
 import { calculateRentalPrices } from '../calc'
 
@@ -30,6 +35,43 @@ function formatArea(value) {
   return `${Number(value).toFixed(2)} m²`
 }
 
+function formatPercent(value) {
+  return `${Number(value).toFixed(1)}%`
+}
+
+function parseRooms(text) {
+  if (!text) return []
+  return text
+    .split(/[\n,;]+/)
+    .map(segment => segment.replace(/[^0-9.]/g, ''))
+    .map(Number)
+    .filter(area => !Number.isNaN(area) && area > 0)
+}
+
+function toNumber(value, fallback = 0) {
+  const numeric = Number(value)
+  return Number.isFinite(numeric) ? numeric : fallback
+}
+
+function validateInputs(monthlyFee, tax, profit, investment, minProfit) {
+  if (toNumber(monthlyFee, DEFAULTS.monthlyFee) < 0) {
+    return 'Monthly fees must be zero or higher.'
+  }
+  if (toNumber(tax, DEFAULTS.tax) < 0 || toNumber(tax, DEFAULTS.tax) >= 100) {
+    return 'Tax must stay between 0% and 99.99%.'
+  }
+  if (toNumber(profit, DEFAULTS.profit) < 0) {
+    return 'Annual profit must be zero or higher.'
+  }
+  if (toNumber(investment, DEFAULTS.investment) < 0) {
+    return 'Investment must be zero or higher.'
+  }
+  if (toNumber(minProfit, DEFAULTS.minProfit) < 0) {
+    return 'Minimum monthly profit must be zero or higher.'
+  }
+  return ''
+}
+
 export default function Calculator() {
   const [activeTab, setActiveTab] = useState('inputs')
   const [roomsText, setRoomsText] = useState(DEFAULTS.roomsText)
@@ -40,6 +82,15 @@ export default function Calculator() {
   const [minProfit, setMinProfit] = useState(DEFAULTS.minProfit)
   const [result, setResult] = useState(null)
   const [roomsError, setRoomsError] = useState('')
+  const [validationError, setValidationError] = useState('')
+  const debounceRef = useRef(null)
+
+  const parsedRooms = useMemo(() => parseRooms(roomsText), [roomsText])
+  const roomsTotalArea = useMemo(
+    () => parsedRooms.reduce((sum, area) => sum + area, 0),
+    [parsedRooms]
+  )
+  const formStatusMessage = roomsError || validationError
 
   useEffect(() => {
     try {
@@ -48,41 +99,14 @@ export default function Calculator() {
       const data = JSON.parse(saved)
       setRoomsText((data.rooms || []).join(', '))
       setMonthlyFee(data.monthlyFee ?? DEFAULTS.monthlyFee)
-      setTax((data.tax ?? 0.10) * 100)
-      setProfit((data.profit ?? 0.15) * 100)
+      setTax((data.tax ?? DEFAULTS.tax / 100) * 100)
+      setProfit((data.profit ?? DEFAULTS.profit / 100) * 100)
       setInvestment(data.investment ?? DEFAULTS.investment)
       setMinProfit(data.minProfit ?? DEFAULTS.minProfit)
-      if (data.rooms) {
-        const res = calculateRentalPrices(
-          data.rooms,
-          data.monthlyFee,
-          data.tax,
-          data.profit,
-          data.investment,
-          data.minProfit
-        )
-        setResult(res)
-      }
     } catch {
       localStorage.removeItem('pea-rental-calc')
     }
   }, [])
-
-  const debounceRef = useRef(null)
-
-  function parseRooms(text) {
-    if (!text) return []
-    return text
-      .split(/[\n,;]+/)
-      .map(s => s.replace(/[^0-9.]/g, ''))
-      .map(Number)
-      .filter(n => !Number.isNaN(n) && n > 0)
-  }
-
-  function toNumber(value, fallback = 0) {
-    const numeric = Number(value)
-    return Number.isFinite(numeric) ? numeric : fallback
-  }
 
   function compute(
     roomsArray,
@@ -96,8 +120,15 @@ export default function Calculator() {
       setResult(null)
       return
     }
-    const res = calculateRentalPrices(roomsArray, mFee, t, p, inv, minP)
-    if (res) setResult(res)
+
+    const calculation = calculateRentalPrices(roomsArray, mFee, t, p, inv, minP)
+    if (!calculation || !Number.isFinite(calculation.totalMonthlyIncomeBeforeTax)) {
+      setValidationError('Please review the inputs to keep calculations within valid ranges.')
+      setResult(null)
+      return
+    }
+
+    setResult(calculation)
     localStorage.setItem(
       'pea-rental-calc',
       JSON.stringify({
@@ -113,16 +144,27 @@ export default function Calculator() {
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
+
     debounceRef.current = setTimeout(() => {
-      const rooms = parseRooms(roomsText)
-      if (roomsText.trim().length > 0 && rooms.length === 0) {
+      if (roomsText.trim().length > 0 && parsedRooms.length === 0) {
         setRoomsError('Enter valid room areas separated by commas, semicolons, or line breaks.')
+        setValidationError('')
         setResult(null)
         return
       }
+
+      const nextValidationError = validateInputs(monthlyFee, tax, profit, investment, minProfit)
       setRoomsError('')
+
+      if (nextValidationError) {
+        setValidationError(nextValidationError)
+        setResult(null)
+        return
+      }
+
+      setValidationError('')
       compute(
-        rooms,
+        parsedRooms,
         toNumber(monthlyFee, DEFAULTS.monthlyFee),
         toNumber(tax, DEFAULTS.tax) / 100,
         toNumber(profit, DEFAULTS.profit) / 100,
@@ -130,158 +172,252 @@ export default function Calculator() {
         toNumber(minProfit, DEFAULTS.minProfit)
       )
     }, 300)
+
     return () => clearTimeout(debounceRef.current)
-  }, [roomsText, monthlyFee, tax, profit, investment, minProfit])
+  }, [roomsText, parsedRooms, monthlyFee, tax, profit, investment, minProfit])
 
   return (
     <>
-      <Toolbar bottom tabbar>
-        <Link
-          tabLink="#tab-inputs"
-          tabLinkActive={activeTab === 'inputs'}
+      <Segmented strong className="calc-segmented">
+        <Button
+          active={activeTab === 'inputs'}
           onClick={() => setActiveTab('inputs')}
-          text="Calculator"
-        />
-        <Link
-          tabLink="#tab-results"
-          tabLinkActive={activeTab === 'results'}
+          type="button"
+        >
+          Inputs
+        </Button>
+        <Button
+          active={activeTab === 'results'}
           onClick={() => setActiveTab('results')}
-          text="Results"
-        />
-      </Toolbar>
+          type="button"
+        >
+          Results
+        </Button>
+      </Segmented>
 
       <Tabs animated>
-        <Tab id="tab-inputs" tabActive={activeTab === 'inputs'} className="page-content">
-          <BlockTitle medium>Room setup</BlockTitle>
+        <Tab id="tab-inputs" tabActive={activeTab === 'inputs'} className="page-content calc-shell">
+          <Card className="calc-overview-card">
+            <CardHeader>Setup overview</CardHeader>
+            <CardContent>
+              <div className="calc-kpi-grid">
+                <div className="calc-kpi">
+                  <div className="calc-kpi-label">Rooms</div>
+                  <div className="calc-kpi-value">{parsedRooms.length}</div>
+                </div>
+                <div className="calc-kpi">
+                  <div className="calc-kpi-label">Total area</div>
+                  <div className="calc-kpi-value">{formatArea(roomsTotalArea)}</div>
+                </div>
+              </div>
+
+              <div className="calc-helper-text">
+                Results update automatically and stay saved on this device for the next visit.
+              </div>
+
+              {parsedRooms.length > 0 && (
+                <div className="calc-room-chips">
+                  {parsedRooms.map((area, index) => (
+                    <Chip key={`${area}-${index}`} text={`Room ${index + 1} · ${formatArea(area)}`} />
+                  ))}
+                </div>
+              )}
+            </CardContent>
+            <CardFooter className={formStatusMessage ? 'text-color-red' : 'calc-helper-text'}>
+              {formStatusMessage || 'Use room sizes in square meters and refine the assumptions below.'}
+            </CardFooter>
+          </Card>
+
+          <BlockHeader medium>Rooms</BlockHeader>
           <List inset strong dividersIos>
             <ListInput
               clearButton
+              errorMessage={roomsError}
+              errorMessageForce={Boolean(roomsError)}
+              info="Use commas, semicolons, or line breaks."
+              inputProps={{ rows: 3 }}
               label="Room areas"
               placeholder="48, 34, 14, 10"
               type="textarea"
-              resizable={false}
-              inputProps={{ rows: 1 }}
-              info="Use commas, semicolons, or line breaks."
               value={roomsText}
-              onInput={e => setRoomsText(e.target.value)}
+              onInput={event => setRoomsText(event.target.value)}
             />
           </List>
 
-          <BlockTitle medium>Recurring costs</BlockTitle>
+          <BlockHeader medium>Costs and taxes</BlockHeader>
           <List inset strong dividersIos>
             <ListInput
               clearButton
               inputmode="decimal"
-              min="0"
-              step="0.01"
               label="Monthly fees (€)"
+              min="0"
               placeholder="250"
+              step="0.01"
               type="number"
               value={monthlyFee}
-              onInput={e => setMonthlyFee(e.target.value)}
+              onInput={event => setMonthlyFee(event.target.value)}
             />
             <ListInput
               clearButton
               inputmode="decimal"
-              min="0"
-              step="0.01"
               label="Tax (%)"
+              min="0"
+              max="99.99"
               placeholder="10"
+              step="0.01"
               type="number"
               value={tax}
-              onInput={e => setTax(e.target.value)}
+              onInput={event => setTax(event.target.value)}
             />
           </List>
 
-          <BlockTitle medium>Profit goals</BlockTitle>
+          <BlockHeader medium>Profit targets</BlockHeader>
           <List inset strong dividersIos>
             <ListInput
               clearButton
               inputmode="decimal"
-              min="0"
-              step="0.01"
               label="Annual profit (%)"
+              min="0"
               placeholder="15"
+              step="0.01"
               type="number"
               value={profit}
-              onInput={e => setProfit(e.target.value)}
+              onInput={event => setProfit(event.target.value)}
             />
             <ListInput
               clearButton
               inputmode="decimal"
-              min="0"
-              step="0.01"
               label="Investment (€)"
+              min="0"
               placeholder="25000"
+              step="0.01"
               type="number"
               value={investment}
-              onInput={e => setInvestment(e.target.value)}
+              onInput={event => setInvestment(event.target.value)}
             />
             <ListInput
               clearButton
               inputmode="decimal"
-              min="0"
-              step="0.01"
               label="Minimum monthly profit (€)"
+              min="0"
               placeholder="100"
+              step="0.01"
               type="number"
               value={minProfit}
-              onInput={e => setMinProfit(e.target.value)}
+              onInput={event => setMinProfit(event.target.value)}
             />
           </List>
-        </Tab>
 
-        <Tab id="tab-results" tabActive={activeTab === 'results'} className="page-content">
-          {roomsError && (
-            <Block strong inset role="alert" className="text-color-red">
-              {roomsError}
+          {result && (
+            <Block strong inset>
+              <div className="calc-helper-text">
+                Ready to review a pricing recommendation for {parsedRooms.length} rooms.
+              </div>
+              <Button fill large onClick={() => setActiveTab('results')} type="button">
+                View detailed results
+              </Button>
             </Block>
           )}
+        </Tab>
 
-          {!roomsError && !result && (
-            <Block strong inset>Enter at least one room area to see pricing results.</Block>
+        <Tab id="tab-results" tabActive={activeTab === 'results'} className="page-content calc-shell">
+          {formStatusMessage && (
+            <Card>
+              <CardHeader className="text-color-red">Check your inputs</CardHeader>
+              <CardContent>{formStatusMessage}</CardContent>
+            </Card>
+          )}
+
+          {!formStatusMessage && !result && (
+            <Card>
+              <CardHeader>No pricing yet</CardHeader>
+              <CardContent>Enter at least one valid room area to see your pricing breakdown.</CardContent>
+            </Card>
           )}
 
           {result && (
             <>
+              <Card className="calc-status-card">
+                <CardHeader className={result.isGoalAchieved ? 'text-color-green' : 'text-color-orange'}>
+                  {result.isGoalAchieved ? 'Goal achieved' : 'Goal needs adjustment'}
+                </CardHeader>
+                <CardContent>
+                  <div className="calc-kpi-grid">
+                    <div className="calc-kpi">
+                      <div className="calc-kpi-label">Net profit</div>
+                      <div className="calc-kpi-value">{formatMoney(result.netProfit)}</div>
+                    </div>
+                    <div className="calc-kpi">
+                      <div className="calc-kpi-label">Target profit</div>
+                      <div className="calc-kpi-value">{formatMoney(result.monthlyTargetProfit)}</div>
+                    </div>
+                    <div className="calc-kpi">
+                      <div className="calc-kpi-label">Rent price</div>
+                      <div className="calc-kpi-value">{formatMoney(result.pricePerSqM, '€/m²')}</div>
+                    </div>
+                    <div className="calc-kpi">
+                      <div className="calc-kpi-label">Total due</div>
+                      <div className="calc-kpi-value">{formatMoney(result.totalMonthlyIncomeBeforeTax)}</div>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter className="calc-helper-text">
+                  {result.isGoalAchieved
+                    ? 'The current pricing reaches the requested monthly return.'
+                    : 'Increase rent or lower costs to reach the requested monthly return.'}
+                </CardFooter>
+              </Card>
+
+              <BlockHeader medium>Monthly summary</BlockHeader>
               <List inset strong dividersIos>
-                <ListItem
-                  title="Status"
-                  after={result.isGoalAchieved ? 'Goal achieved' : 'Goal not reached'}
-                />
                 <ListItem title="Total area" after={formatArea(result.roomsTotalArea)} />
-                <ListItem title="Target profit" after={formatMoney(result.monthlyTargetProfit)} />
-                <ListItem title="Rent price" after={formatMoney(result.pricePerSqM, '€/m²')} />
-                <ListItem title="Monthly fees" after={formatMoney(result.monthlyFeePerSqM, '€/m²')} />
-                <ListItem title="Total rent" after={formatMoney(result.totalRent)} />
-                <ListItem title="Total fees" after={formatMoney(result.totalFees)} />
+                <ListItem title="Estimated income before tax" after={formatMoney(result.totalMonthlyIncomeBeforeTax)} />
+                <ListItem title="Monthly fees" after={formatMoney(result.totalFees)} />
                 <ListItem title="Tax paid" after={formatMoney(result.totalTaxPaid)} />
-                <ListItem title="Net profit" after={formatMoney(result.netProfit)} />
+                <ListItem title="Total rent" after={formatMoney(result.totalRent)} />
+                <ListItem title="Fees per m²" after={formatMoney(result.monthlyFeePerSqM, '€/m²')} />
               </List>
 
-              <BlockTitle medium>Per-room pricing breakdown</BlockTitle>
-              <List inset strong dividersIos>
-                {result.rows.map(row => (
-                  <ListItem
-                    accordionItem
-                    key={row.index}
-                    title={`Room ${row.index}`}
-                    after={formatMoney(row.total)}
-                  >
-                    <AccordionContent>
-                      <Block inset strong>
-                        <dl className="no-margin">
-                          <dt>Area</dt>
-                          <dd>{formatArea(row.area)}</dd>
-                          <dt>Rent</dt>
-                          <dd>{formatMoney(row.rent)}</dd>
-                          <dt>Fees</dt>
-                          <dd>{formatMoney(row.fee)}</dd>
-                        </dl>
-                      </Block>
-                    </AccordionContent>
-                  </ListItem>
-                ))}
+              <BlockHeader medium>Per-room detail</BlockHeader>
+              <List inset mediaList strong dividersIos>
+                {result.rows.map(row => {
+                  const areaShare = result.roomsTotalArea > 0 ? (row.area / result.roomsTotalArea) * 100 : 0
+
+                  return (
+                    <ListItem
+                      accordionItem
+                      key={row.index}
+                      after={formatMoney(row.total)}
+                      footer={`${formatMoney(row.total / row.area, '€/m²')} total`}
+                      subtitle={`${formatArea(row.area)} · ${formatPercent(areaShare)} of total area`}
+                      title={`Room ${row.index}`}
+                    >
+                      <AccordionContent>
+                        <Block strong inset>
+                          <div className="calc-room-detail">
+                            <div className="calc-room-total">{formatMoney(row.total)}</div>
+                            <div className="calc-detail-row">
+                              <span className="calc-detail-label">Area</span>
+                              <span>{formatArea(row.area)}</span>
+                            </div>
+                            <div className="calc-detail-row">
+                              <span className="calc-detail-label">Rent portion</span>
+                              <span>{formatMoney(row.rent)}</span>
+                            </div>
+                            <div className="calc-detail-row">
+                              <span className="calc-detail-label">Fees portion</span>
+                              <span>{formatMoney(row.fee)}</span>
+                            </div>
+                            <div className="calc-detail-row">
+                              <span className="calc-detail-label">Share of total area</span>
+                              <span>{formatPercent(areaShare)}</span>
+                            </div>
+                          </div>
+                        </Block>
+                      </AccordionContent>
+                    </ListItem>
+                  )
+                })}
               </List>
             </>
           )}
