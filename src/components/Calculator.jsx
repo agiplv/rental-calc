@@ -12,10 +12,6 @@ import {
   List,
   ListInput,
   ListItem,
-  Tab,
-  Tabs,
-  Toolbar,
-  Link,
 } from 'framework7-react'
 import { calculateRentalPrices } from '../calc'
 
@@ -89,7 +85,6 @@ function validateInputs(monthlyFee, tax, profit, investment, minProfit, sizeWeig
 }
 
 export default function Calculator() {
-  const [activeTab, setActiveTab] = useState('inputs')
   const [roomsText, setRoomsText] = useState(DEFAULTS.roomsText)
   const [newRoomText, setNewRoomText] = useState('')
   const [monthlyFee, setMonthlyFee] = useState(DEFAULTS.monthlyFee)
@@ -208,11 +203,9 @@ export default function Calculator() {
   }, [roomsText, parsedRooms, monthlyFee, tax, profit, investment, minProfit, sizeWeight])
 
   return (
-    <>
-      {/* Tabs are controlled by `activeTab`; toolbar below provides quick access */}
-
-      <Tabs>
-        <Tab id="tab-inputs" tabActive={activeTab === 'inputs'} className="page-content">
+    <div className="page-content">
+      <Card className="margin-top margin-horizontal margin-bottom">
+        <CardContent className="padding-top">
           <BlockTitle medium>Rooms</BlockTitle>
           <List className="list-strong list-dividers inset-ios">
             <ListInput
@@ -351,10 +344,7 @@ export default function Calculator() {
             </ListInput>
           </List>
 
-          {/* result preview removed — details available under Results tab */}
-        </Tab>
-
-        <Tab id="tab-results" tabActive={activeTab === 'results'} className="page-content padding-top">
+          <BlockTitle medium>Results</BlockTitle>
           {formStatusMessage && (
             <List className="list-strong list-dividers inset-ios">
               <ListItem title="Check your inputs">
@@ -467,30 +457,8 @@ export default function Calculator() {
               </div>
             </>
           )}
-        </Tab>
-      </Tabs>
-
-      <Toolbar bottom tabbar>
-        <Link
-          className="display-flex flex-direction-column justify-content-center align-items-center"
-          tabLink="#tab-inputs"
-          tabLinkActive={activeTab === 'inputs'}
-          onClick={() => setActiveTab('inputs')}
-        >
-          <i className="icon f7-icons">square_list_fill</i>
-          <span className="toolbar-label font-weight-medium">Inputs</span>
-        </Link>
-        <Link
-          className="display-flex flex-direction-column justify-content-center align-items-center"
-          tabLink="#tab-results"
-          tabLinkActive={activeTab === 'results'}
-          onClick={() => setActiveTab('results')}
-        >
-          <i className="icon f7-icons">chart_bar_fill</i>
-          <span className="toolbar-label font-weight-medium">Results</span>
-        </Link>
-        {/* Removed 'More' action to keep toolbar minimal for iOS UX */}
-      </Toolbar>
-    </>
+        </CardContent>
+      </Card>
+    </div>
   )
 }

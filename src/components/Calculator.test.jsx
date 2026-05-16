@@ -103,23 +103,15 @@ describe('Calculator', () => {
     vi.useRealTimers()
   })
 
-  it('shows results tab content when switching from toolbar', async () => {
-    const { container } = render(<Calculator />)
+  it('shows inputs and results content in one combined view', async () => {
+    render(<Calculator />)
 
     await act(async () => {
       vi.advanceTimersByTime(350)
     })
 
-    const inputsTab = container.querySelector('#tab-inputs')
-    const resultsTab = container.querySelector('#tab-results')
-
-    expect(inputsTab).toHaveClass('tab-active')
-    expect(resultsTab).not.toHaveClass('tab-active')
-
-    fireEvent.click(screen.getByRole('button', { name: /results/i }))
-
-    expect(inputsTab).not.toHaveClass('tab-active')
-    expect(resultsTab).toHaveClass('tab-active')
+    expect(screen.getByText('Rooms')).toBeInTheDocument()
+    expect(screen.getByText('Results')).toBeInTheDocument()
     expect(screen.getByText('Details')).toBeInTheDocument()
     expect(screen.getByText('Summary')).toBeInTheDocument()
     expect(screen.getAllByText('Total due').length).toBeGreaterThan(0)
@@ -159,7 +151,6 @@ describe('Calculator', () => {
       vi.advanceTimersByTime(350)
     })
 
-    fireEvent.click(screen.getByRole('button', { name: /results/i }))
     expect(screen.getByText('Check your inputs')).toBeInTheDocument()
   })
 
