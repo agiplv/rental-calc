@@ -13,15 +13,19 @@ vi.mock('framework7-react', () => {
     'labels',
     'large',
     'mediaList',
+    'noHairlinesBetween',
     'noMarginBottom',
     'noMarginTop',
     'position',
+    'right',
     'small',
+    'swipeout',
     'swipeable',
     'tabbar',
     'tabLink',
     'tabActive',
     'tabLinkActive',
+    'delete',
   ])
 
   const cleanProps = props =>
@@ -132,6 +136,12 @@ vi.mock('framework7-react', () => {
       )
     },
     Tabs: ({ children, ...props }) => <div {...cleanProps(props)}>{children}</div>,
+    SwipeoutActions: wrap('div'),
+    SwipeoutButton: ({ children, onClick, type = 'button', ...props }) => (
+      <button type={type} onClick={onClick} {...cleanProps(props)}>
+        {children}
+      </button>
+    ),
     Toolbar: wrap('div'),
   }
 })
@@ -187,8 +197,8 @@ describe('Calculator', () => {
       vi.advanceTimersByTime(350)
     })
 
-    expect(screen.getByText('20 m²')).toBeInTheDocument()
-    expect(screen.getByText('10 m²')).toBeInTheDocument()
+    expect(screen.getByText('20.00 m²')).toBeInTheDocument()
+    expect(screen.getByText('10.00 m²')).toBeInTheDocument()
     expect(screen.getAllByText('30.00 m²').length).toBeGreaterThan(0)
   })
 
@@ -224,6 +234,6 @@ describe('Calculator', () => {
     })
 
     expect(addRoomButton).toBeDisabled()
-    expect(screen.getByText('22 m²')).toBeInTheDocument()
+    expect(screen.getByText('22.00 m²')).toBeInTheDocument()
   })
 })
