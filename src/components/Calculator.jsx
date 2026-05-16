@@ -220,7 +220,7 @@ export default function Calculator() {
           </Toolbar>
 
           <Tabs swipeable>
-            <Tab id="tab-calc" tabActive>
+            <Tab id="tab-calc" tabActive={activeTab === 'calc'}>
               <List className="list-strong list-dividers inset-ios">
                 <ListItem accordionItem title="Rooms">
                   <AccordionContent>
@@ -369,7 +369,7 @@ export default function Calculator() {
               </List>
             </Tab>
 
-            <Tab id="tab-result">
+            <Tab id="tab-result" tabActive={activeTab === 'result'}>
               {formStatusMessage && (
                 <List className="list-strong list-dividers inset-ios">
                   <ListItem title="Check your inputs">

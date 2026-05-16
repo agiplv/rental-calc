@@ -35,6 +35,8 @@ vi.mock('framework7-react', () => {
     return Wrapped
   }
 
+  const TabContext = React.createContext({ activeTab: null, setActiveTab: () => {} })
+
   return {
     AccordionContent: ({ children }) => <Fragment>{children}</Fragment>,
     AccordionItem: wrap('div'),
@@ -49,11 +51,22 @@ vi.mock('framework7-react', () => {
     CardContent: wrap('div'),
     CardHeader: wrap('div'),
     Chip: ({ text }) => <span>{text}</span>,
-    Link: ({ children, onClick, ...props }) => (
-      <button type="button" onClick={onClick} {...cleanProps(props)}>
-        {children}
-      </button>
-    ),
+    Link: ({ children, onClick, tabLink, tabLinkActive, ...props }) => {
+      const { setActiveTab } = React.useContext(TabContext)
+      return (
+        <button
+          type="button"
+          aria-pressed={tabLinkActive ? 'true' : 'false'}
+          onClick={event => {
+            if (tabLink) setActiveTab(tabLink)
+            onClick?.(event)
+          }}
+          {...cleanProps(props)}
+        >
+          {children}
+        </button>
+      )
+    },
     List: wrap('div'),
     ListInput: ({ label, type, value, onInput, placeholder, inputProps = {}, inputmode, children }) => {
       const InputTag = type === 'textarea' ? 'textarea' : 'input'
@@ -81,12 +94,23 @@ vi.mock('framework7-react', () => {
         {children}
       </div>
     ),
-    Tab: ({ children, id, tabActive, className }) => (
-      <div id={id} className={`tab ${className || ''} ${tabActive ? 'tab-active' : ''}`.trim()}>
-        {children}
-      </div>
-    ),
-    Tabs: wrap('div'),
+    Tab: ({ children, id, tabActive, className }) => {
+      const { activeTab } = React.useContext(TabContext)
+      const isActive = tabActive || activeTab === `#${id}`
+      return (
+        <div id={id} className={`tab ${className || ''} ${isActive ? 'tab-active' : ''}`.trim()}>
+          {isActive ? children : null}
+        </div>
+      )
+    },
+    Tabs: ({ children, ...props }) => {
+      const [activeTab, setActiveTab] = React.useState('#tab-calc')
+      return (
+        <TabContext.Provider value={{ activeTab, setActiveTab }}>
+          <div {...cleanProps(props)}>{children}</div>
+        </TabContext.Provider>
+      )
+    },
     Toolbar: wrap('div'),
   }
 })
@@ -113,6 +137,7 @@ describe('Calculator', () => {
 
     expect(screen.getByRole('button', { name: 'Calc' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Result' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Result' }))
     expect(screen.getByText('Summary')).toBeInTheDocument()
     expect(screen.getAllByText('Total due').length).toBeGreaterThan(0)
   })
@@ -151,6 +176,7 @@ describe('Calculator', () => {
       vi.advanceTimersByTime(350)
     })
 
+    fireEvent.click(screen.getByRole('button', { name: 'Result' }))
     expect(screen.getByText('Check your inputs')).toBeInTheDocument()
   })
 
