@@ -59,6 +59,37 @@
   margin-top: 12px;
 }
 
+.calc-room-block {
+  padding: 8px 6px;
+}
+
+.calc-room-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.calc-room-chips {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  max-width: calc(100% - 90px);
+}
+
+.calc-room-chips .chip {
+  padding: 6px 8px;
+  font-size: 13px;
+  border-radius: 12px;
+}
+
+.calc-room-add-input {
+  width: 72px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--f7-list-item-divider-bg-color);
+  font-size: 14px;
+}
+
 .calc-helper-text {
   color: var(--f7-text-color-secondary);
   font-size: 14px;
