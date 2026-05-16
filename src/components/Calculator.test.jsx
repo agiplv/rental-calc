@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('framework7-react', () => {
-  const frameworkOnlyProps = new Set([
+  const frameworkSpecificProps = new Set([
     'accordionItem',
     'bottom',
     'clearButton',
@@ -22,7 +22,7 @@ vi.mock('framework7-react', () => {
     Object.fromEntries(
       Object.entries(props).filter(
         ([key, value]) =>
-          value !== undefined && !frameworkOnlyProps.has(key)
+          value !== undefined && !frameworkSpecificProps.has(key)
       )
     )
 
@@ -114,6 +114,31 @@ describe('Calculator', () => {
     expect(inputsTab).not.toHaveClass('tab-active')
     expect(resultsTab).toHaveClass('tab-active')
     expect(screen.getByText('Monthly summary')).toBeInTheDocument()
+  })
+
+  it('restores saved room data from localStorage', async () => {
+    localStorage.setItem(
+      'pea-rental-calc',
+      JSON.stringify({
+        rooms: [20, 10],
+        monthlyFee: 300,
+        tax: 0.2,
+        profit: 0.1,
+        investment: 12000,
+        minProfit: 75,
+        sizeWeight: 1,
+      })
+    )
+
+    render(<Calculator />)
+
+    await act(async () => {
+      vi.advanceTimersByTime(350)
+    })
+
+    expect(screen.getByText('20 m²')).toBeInTheDocument()
+    expect(screen.getByText('10 m²')).toBeInTheDocument()
+    expect(screen.getByText('30.00 m²')).toBeInTheDocument()
   })
 
   it('shows validation feedback for invalid percentage input', async () => {
