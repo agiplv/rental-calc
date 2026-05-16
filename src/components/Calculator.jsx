@@ -270,9 +270,14 @@ export default function Calculator() {
                   >
                     <AccordionContent>
                       <Block inset strong>
-                        <div>{formatArea(row.area)}</div>
-                        <div>{formatMoney(row.rent)} rent</div>
-                        <div>{formatMoney(row.fee)} fees</div>
+                        <dl className="no-margin">
+                          <dt>Area</dt>
+                          <dd>{formatArea(row.area)}</dd>
+                          <dt>Rent</dt>
+                          <dd>{formatMoney(row.rent)}</dd>
+                          <dt>Fees</dt>
+                          <dd>{formatMoney(row.fee)}</dd>
+                        </dl>
                       </Block>
                     </AccordionContent>
                   </ListItem>
