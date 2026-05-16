@@ -1,14 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
   AccordionContent,
-  Block,
   BlockHeader,
-  Card,
-  CardContent,
-  CardHeader,
   Chip,
   List,
-  ListInput,
   ListItem,
   Tab,
   Tabs,
@@ -193,137 +188,211 @@ export default function Calculator() {
         <Tab id="tab-inputs" tabActive={activeTab === 'inputs'} className="page-content calc-shell">
 
           <BlockHeader medium>Rooms</BlockHeader>
-          <Block strong inset className="calc-room-block">
-            <div className="calc-room-input-row">
-              <div className="calc-room-chips">
-                {parsedRooms.map((area, index) => (
-                  <Chip
-                    key={`${area}-${index}`}
-                    text={`${area} m²`}
-                    deleteable
-                    onDelete={() => {
-                      const next = parsedRooms.filter((_, i) => i !== index)
-                      setRoomsText(next.join(', '))
+          <List className="list-strong list-dividers inset-ios">
+            <li className="item-content item-input">
+              <div className="item-inner">
+                <div className="item-title item-label">Add room area</div>
+                <div className="item-input-wrap">
+                  <input
+                    className="text-align-right"
+                    aria-label="Add room size"
+                    inputMode="decimal"
+                    min="0"
+                    placeholder="Add"
+                    step="0.01"
+                    type="number"
+                    value={newRoomText}
+                    onChange={e => setNewRoomText(e.target.value)}
+                    onKeyDown={event => {
+                      if (event.key === 'Enter' || event.key === ',') {
+                        event.preventDefault()
+                        const normalized = (newRoomText || '').replace(/[^0-9.]/g, '').trim()
+                        const val = Number(normalized)
+                        if (Number.isFinite(val) && val > 0) {
+                          const next = parsedRooms.concat(val)
+                          setRoomsText(next.join(', '))
+                          setNewRoomText('')
+                        }
+                      }
                     }}
                   />
-                ))}
+                  <span className="input-clear-button" />
+                </div>
+                <div className="item-after">m²</div>
               </div>
-
-              <input
-                className="calc-room-add-input"
-                aria-label="Add room size"
-                placeholder="Add"
-                value={newRoomText}
-                onChange={e => setNewRoomText(e.target.value)}
-                onKeyDown={event => {
-                  if (event.key === 'Enter' || event.key === ',') {
-                    event.preventDefault()
-                    const normalized = (newRoomText || '').replace(/[^0-9.]/g, '').trim()
-                    const val = Number(normalized)
-                    if (Number.isFinite(val) && val > 0) {
-                      const next = parsedRooms.concat(val)
-                      setRoomsText(next.join(', '))
-                      setNewRoomText('')
-                    }
-                  }
-                }}
-              />
-            </div>
-            {roomsError && <div className="calc-helper-text text-color-red">{roomsError}</div>}
-          </Block>
+            </li>
+            <li className="item-content">
+              <div className="item-inner">
+                <div className="item-input-wrap">
+                  <div className="calc-room-chips">
+                    {parsedRooms.map((area, index) => (
+                      <Chip
+                        key={`${area}-${index}`}
+                        text={`${area} m²`}
+                        deleteable
+                        onDelete={() => {
+                          const next = parsedRooms.filter((_, i) => i !== index)
+                          setRoomsText(next.join(', '))
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className="item-after text-color-black">{formatArea(roomsTotalArea)}</div>
+              </div>
+            </li>
+            {roomsError && (
+              <li className="item-content">
+                <div className="item-inner">
+                  <div className="item-title text-color-red">{roomsError}</div>
+                </div>
+              </li>
+            )}
+          </List>
 
           <BlockHeader medium>Costs and taxes</BlockHeader>
-          <List inset strong dividersIos>
-            <ListInput
-              clearButton
-              inputmode="decimal"
-              label="Monthly fees (€)"
-              min="0"
-              placeholder="250"
-              step="0.01"
-              type="number"
-              value={monthlyFee}
-              onInput={event => setMonthlyFee(event.target.value)}
-            />
-            <ListInput
-              clearButton
-              inputmode="decimal"
-              label="Tax (%)"
-              min="0"
-              max="99.99"
-              placeholder="10"
-              step="0.01"
-              type="number"
-              value={tax}
-              onInput={event => setTax(event.target.value)}
-            />
+          <List className="list-strong list-dividers inset-ios">
+            <li className="item-content item-input">
+              <div className="item-inner">
+                <div className="item-title item-label">Monthly fees</div>
+                <div className="item-input-wrap">
+                  <input
+                    className="text-align-right"
+                    inputMode="decimal"
+                    min="0"
+                    placeholder="250"
+                    step="0.01"
+                    type="number"
+                    value={monthlyFee}
+                    onInput={event => setMonthlyFee(event.target.value)}
+                  />
+                  <span className="input-clear-button" />
+                </div>
+                <div className="item-after">€</div>
+              </div>
+            </li>
+            <li className="item-content item-input">
+              <div className="item-inner">
+                <div className="item-title item-label">Tax</div>
+                <div className="item-input-wrap">
+                  <input
+                    className="text-align-right"
+                    inputMode="decimal"
+                    min="0"
+                    max="99.99"
+                    placeholder="10"
+                    step="0.01"
+                    type="number"
+                    value={tax}
+                    onInput={event => setTax(event.target.value)}
+                  />
+                  <span className="input-clear-button" />
+                </div>
+                <div className="item-after">%</div>
+              </div>
+            </li>
           </List>
 
           <BlockHeader medium>Profit targets</BlockHeader>
-          <List inset strong dividersIos>
-            <ListInput
-              clearButton
-              inputmode="decimal"
-              label="Annual profit (%)"
-              min="0"
-              placeholder="15"
-              step="0.01"
-              type="number"
-              value={profit}
-              onInput={event => setProfit(event.target.value)}
-            />
-            <ListInput
-              clearButton
-              inputmode="decimal"
-              label="Investment (€)"
-              min="0"
-              placeholder="25000"
-              step="0.01"
-              type="number"
-              value={investment}
-              onInput={event => setInvestment(event.target.value)}
-            />
-            <ListInput
-              clearButton
-              inputmode="decimal"
-              label="Minimum monthly profit (€)"
-              min="0"
-              placeholder="100"
-              step="0.01"
-              type="number"
-              value={minProfit}
-              onInput={event => setMinProfit(event.target.value)}
-            />
-            <ListInput
-              clearButton
-              inputmode="decimal"
-              label="Size weighting (k)"
-              min="0"
-              max="10"
-              placeholder="0"
-              step="0.01"
-              type="number"
-              value={sizeWeight}
-              onInput={event => setSizeWeight(event.target.value)}
-            />
+          <List className="list-strong list-dividers inset-ios">
+            <li className="item-content item-input">
+              <div className="item-inner">
+                <div className="item-title item-label">Annual profit</div>
+                <div className="item-input-wrap">
+                  <input
+                    className="text-align-right"
+                    inputMode="decimal"
+                    min="0"
+                    placeholder="15"
+                    step="0.01"
+                    type="number"
+                    value={profit}
+                    onInput={event => setProfit(event.target.value)}
+                  />
+                  <span className="input-clear-button" />
+                </div>
+                <div className="item-after">%</div>
+              </div>
+            </li>
+            <li className="item-content item-input">
+              <div className="item-inner">
+                <div className="item-title item-label">Investment</div>
+                <div className="item-input-wrap">
+                  <input
+                    className="text-align-right"
+                    inputMode="decimal"
+                    min="0"
+                    placeholder="25000"
+                    step="0.01"
+                    type="number"
+                    value={investment}
+                    onInput={event => setInvestment(event.target.value)}
+                  />
+                  <span className="input-clear-button" />
+                </div>
+                <div className="item-after">€</div>
+              </div>
+            </li>
+            <li className="item-content item-input">
+              <div className="item-inner">
+                <div className="item-title item-label">Minimum monthly profit</div>
+                <div className="item-input-wrap">
+                  <input
+                    className="text-align-right"
+                    inputMode="decimal"
+                    min="0"
+                    placeholder="100"
+                    step="0.01"
+                    type="number"
+                    value={minProfit}
+                    onInput={event => setMinProfit(event.target.value)}
+                  />
+                  <span className="input-clear-button" />
+                </div>
+                <div className="item-after">€</div>
+              </div>
+            </li>
+            <li className="item-content item-input">
+              <div className="item-inner">
+                <div className="item-title item-label">Size weighting</div>
+                <div className="item-input-wrap">
+                  <input
+                    className="text-align-right"
+                    inputMode="decimal"
+                    min="0"
+                    max="10"
+                    placeholder="0"
+                    step="0.01"
+                    type="number"
+                    value={sizeWeight}
+                    onInput={event => setSizeWeight(event.target.value)}
+                  />
+                  <span className="input-clear-button" />
+                </div>
+                <div className="item-after">k</div>
+              </div>
+            </li>
           </List>
 
           {/* result preview removed — details available under Results tab */}
         </Tab>
 
-        <Tab id="tab-results" tabActive={activeTab === 'results'} className="page-content calc-shell">
+        <Tab id="tab-results" tabActive={activeTab === 'results'} className="page-content calc-shell padding-top">
           {formStatusMessage && (
-            <Card>
-              <CardHeader className="text-color-red">Check your inputs</CardHeader>
-              <CardContent>{formStatusMessage}</CardContent>
-            </Card>
+            <List className="list-strong list-dividers inset-ios">
+              <ListItem title="Check your inputs">
+                <span slot="after" className="text-color-red">{formStatusMessage}</span>
+              </ListItem>
+            </List>
           )}
 
           {!formStatusMessage && !result && (
-            <Card>
-              <CardHeader>No pricing yet</CardHeader>
-              <CardContent>Enter at least one valid room area to see your pricing breakdown.</CardContent>
-            </Card>
+            <List className="list-strong list-dividers inset-ios">
+              <ListItem
+                footer="Enter at least one valid room area to see your pricing breakdown."
+                title="No pricing yet"
+              />
+            </List>
           )}
 
           {result && (
@@ -331,19 +400,35 @@ export default function Calculator() {
               {/* KPI tiles moved into Monthly summary below */}
 
               <BlockHeader medium>Monthly summary</BlockHeader>
-              <List inset strong dividersIos>
-                <ListItem title="Net profit" after={formatMoney(result.netProfit)} />
-                <ListItem title="Target profit" after={formatMoney(result.monthlyTargetProfit)} />
-                <ListItem title="Rent price" after={formatMoney(result.pricePerSqM, '€/m²')} />
-                <ListItem title="Total due" after={formatMoney(result.totalMonthlyIncomeBeforeTax)} />
-                <ListItem title="Total area" after={formatArea(result.roomsTotalArea)} />
-                <ListItem title="Monthly fees" after={formatMoney(result.totalFees)} />
-                <ListItem title="Tax paid" after={formatMoney(result.totalTaxPaid)} />
-                <ListItem title="Fees per m²" after={formatMoney(result.monthlyFeePerSqM, '€/m²')} />
+              <List className="list-strong list-dividers inset-ios">
+                <ListItem title="Net profit">
+                  <span slot="after" className="text-color-black font-weight-bold">{formatMoney(result.netProfit)}</span>
+                </ListItem>
+                <ListItem title="Target profit">
+                  <span slot="after" className="text-color-black">{formatMoney(result.monthlyTargetProfit)}</span>
+                </ListItem>
+                <ListItem title="Rent price">
+                  <span slot="after" className="text-color-black">{formatMoney(result.pricePerSqM, '€/m²')}</span>
+                </ListItem>
+                <ListItem title="Total due">
+                  <span slot="after" className="text-color-black">{formatMoney(result.totalMonthlyIncomeBeforeTax)}</span>
+                </ListItem>
+                <ListItem title="Total area">
+                  <span slot="after" className="text-color-black">{formatArea(result.roomsTotalArea)}</span>
+                </ListItem>
+                <ListItem title="Monthly fees">
+                  <span slot="after" className="text-color-black">{formatMoney(result.totalFees)}</span>
+                </ListItem>
+                <ListItem title="Tax paid">
+                  <span slot="after" className="text-color-black">{formatMoney(result.totalTaxPaid)}</span>
+                </ListItem>
+                <ListItem title="Fees per m²">
+                  <span slot="after" className="text-color-black">{formatMoney(result.monthlyFeePerSqM, '€/m²')}</span>
+                </ListItem>
               </List>
 
               <BlockHeader medium>Per-room detail</BlockHeader>
-              <List inset mediaList strong dividersIos>
+              <List className="list-strong list-dividers inset-ios media-list">
                 {result.rows.map(row => {
                   const areaShare = result.roomsTotalArea > 0 ? (row.area / result.roomsTotalArea) * 100 : 0
 
@@ -357,27 +442,20 @@ export default function Calculator() {
                       title={`Room ${row.index}`}
                     >
                       <AccordionContent>
-                        <Block strong inset>
-                          <div className="calc-room-detail">
-                            <div className="calc-room-total">{formatMoney(row.total)}</div>
-                            <div className="calc-detail-row">
-                              <span className="calc-detail-label">Area</span>
-                              <span>{formatArea(row.area)}</span>
-                            </div>
-                            <div className="calc-detail-row">
-                              <span className="calc-detail-label">Rent portion</span>
-                              <span>{formatMoney(row.rent)}</span>
-                            </div>
-                            <div className="calc-detail-row">
-                              <span className="calc-detail-label">Fees portion</span>
-                              <span>{formatMoney(row.fee)}</span>
-                            </div>
-                            <div className="calc-detail-row">
-                              <span className="calc-detail-label">Share of total area</span>
-                              <span>{formatPercent(areaShare)}</span>
-                            </div>
-                          </div>
-                        </Block>
+                        <List className="list-strong list-dividers inset-ios no-margin-top no-margin-bottom">
+                          <ListItem title="Area">
+                            <span slot="after" className="text-color-black">{formatArea(row.area)}</span>
+                          </ListItem>
+                          <ListItem title="Rent portion">
+                            <span slot="after" className="text-color-black">{formatMoney(row.rent)}</span>
+                          </ListItem>
+                          <ListItem title="Fees portion">
+                            <span slot="after" className="text-color-black">{formatMoney(row.fee)}</span>
+                          </ListItem>
+                          <ListItem title="Share of total area">
+                            <span slot="after" className="text-color-black">{formatPercent(areaShare)}</span>
+                          </ListItem>
+                        </List>
                       </AccordionContent>
                     </ListItem>
                   )
@@ -390,19 +468,21 @@ export default function Calculator() {
 
       <Toolbar bottom tabbar>
         <Link
+          className="display-flex flex-direction-column justify-content-center align-items-center"
           tabLink="#tab-inputs"
           tabLinkActive
           onClick={() => setActiveTab('inputs')}
         >
-          <i className="icon f7-icons">square_list</i>
-          <span className="toolbar-label">Inputs</span>
+          <i className="icon f7-icons">square_list_fill</i>
+          <span className="toolbar-label font-weight-medium">Inputs</span>
         </Link>
         <Link
+          className="display-flex flex-direction-column justify-content-center align-items-center"
           tabLink="#tab-results"
           onClick={() => setActiveTab('results')}
         >
-          <i className="icon f7-icons">chart_bar</i>
-          <span className="toolbar-label">Results</span>
+          <i className="icon f7-icons">chart_bar_fill</i>
+          <span className="toolbar-label font-weight-medium">Results</span>
         </Link>
         {/* Removed 'More' action to keep toolbar minimal for iOS UX */}
       </Toolbar>
