@@ -38,20 +38,24 @@ vi.mock('framework7-react', () => {
     return Wrapped
   }
 
-  let currentTab = '#tab-calc'
-  const tabSubscribers = new Set()
+  const TAB_STORE_KEY = '__f7MockTabStore'
+  const tabStore = globalThis[TAB_STORE_KEY] || {
+    currentTab: '#tab-calc',
+    subscribers: new Set(),
+  }
+  globalThis[TAB_STORE_KEY] = tabStore
 
   const setCurrentTab = tab => {
-    currentTab = tab
-    tabSubscribers.forEach(notify => notify(tab))
+    tabStore.currentTab = tab
+    tabStore.subscribers.forEach(subscriber => subscriber(tab))
   }
 
   const useTabState = () => {
-    const [activeTab, setActiveTab] = React.useState(currentTab)
+    const [activeTab, setActiveTab] = React.useState(tabStore.currentTab)
 
     React.useEffect(() => {
-      tabSubscribers.add(setActiveTab)
-      return () => tabSubscribers.delete(setActiveTab)
+      tabStore.subscribers.add(setActiveTab)
+      return () => tabStore.subscribers.delete(setActiveTab)
     }, [])
 
     return { activeTab, setActiveTab: setCurrentTab }
@@ -114,9 +118,12 @@ vi.mock('framework7-react', () => {
         {children}
       </div>
     ),
-    Tab: ({ children, id, tabActive, className }) => {
+    Tab: ({ children, id, tabActive, className, onTabShow }) => {
       const { activeTab } = useTabState()
       const isActive = tabActive || activeTab === `#${id}`
+      React.useEffect(() => {
+        if (isActive) onTabShow?.()
+      }, [isActive, onTabShow])
       return (
         <div id={id} className={`tab ${className || ''} ${isActive ? 'tab-active' : ''}`.trim()}>
           {isActive ? children : null}
@@ -133,6 +140,10 @@ import Calculator from './Calculator'
 describe('Calculator', () => {
   beforeEach(() => {
     localStorage.clear()
+    if (globalThis.__f7MockTabStore) {
+      globalThis.__f7MockTabStore.currentTab = '#tab-calc'
+      globalThis.__f7MockTabStore.subscribers.clear()
+    }
     vi.useFakeTimers()
   })
 

@@ -13,6 +13,7 @@ test('captures the main calculator flow in iOS mode', async ({ page }, testInfo)
   })
 
   await page.getByText('Result', { exact: true }).click()
+  await expect(page.locator('#tab-result.tab-active')).toBeVisible()
   await expect(page.getByText('Summary')).toBeVisible()
 
   await testInfo.attach('results-view', {

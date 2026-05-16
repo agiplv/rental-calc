@@ -101,6 +101,7 @@ export default function Calculator() {
   const [result, setResult] = useState(null)
   const [roomsError, setRoomsError] = useState('')
   const [validationError, setValidationError] = useState('')
+  const [activeTab, setActiveTab] = useState(CALC_TAB)
   const debounceRef = useRef(null)
 
   const parsedRooms = useMemo(() => parseRooms(roomsText), [roomsText])
@@ -210,11 +211,11 @@ export default function Calculator() {
   return (
     <>
       <Toolbar tabbar labels position="bottom">
-        <Link tabLink={CALC_TAB} tabLinkActive>
+        <Link tabLink={CALC_TAB} tabLinkActive={activeTab === CALC_TAB} onClick={() => setActiveTab(CALC_TAB)}>
           <i className="icon f7-icons" aria-hidden="true">slider_horizontal_3</i>
           <span>Calc</span>
         </Link>
-        <Link tabLink={RESULT_TAB}>
+        <Link tabLink={RESULT_TAB} tabLinkActive={activeTab === RESULT_TAB} onClick={() => setActiveTab(RESULT_TAB)}>
           <i className="icon f7-icons" aria-hidden="true">chart_bar_fill</i>
           <span>Result</span>
         </Link>
@@ -222,7 +223,7 @@ export default function Calculator() {
 
       <div className="page-content">
         <Tabs swipeable>
-          <Tab id="tab-calc" tabActive>
+          <Tab id="tab-calc" tabActive={activeTab === CALC_TAB} onTabShow={() => setActiveTab(CALC_TAB)}>
             <List className="list-strong list-dividers inset-ios no-hairlines margin-top margin-horizontal margin-bottom">
                   <ListItem accordionItem title="Rooms">
                     <AccordionContent>
@@ -371,7 +372,11 @@ export default function Calculator() {
                 </List>
           </Tab>
 
-          <Tab id="tab-result">
+          <Tab
+            id="tab-result"
+            tabActive={activeTab === RESULT_TAB}
+            onTabShow={() => setActiveTab(RESULT_TAB)}
+          >
             <div className="margin-top margin-horizontal margin-bottom">
               {formStatusMessage && (
                 <List className="list-strong list-dividers inset-ios no-hairlines">
