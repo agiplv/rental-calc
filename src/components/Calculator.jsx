@@ -435,7 +435,7 @@ export default function Calculator() {
                               <span className="text-color-black font-weight-semibold margin-right-half">
                                 {formatMoney(row.total)}
                               </span>
-                              <i className="icon f7-icons text-color-gray">chevron_down</i>
+                              <i className="icon f7-icons text-color-gray" aria-hidden="true">chevron_down</i>
                             </div>
                           </CardHeader>
                         </AccordionToggle>
