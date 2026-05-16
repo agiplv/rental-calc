@@ -3,14 +3,33 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('framework7-react', () => {
+  const frameworkOnlyBooleanProps = new Set([
+    'accordionItem',
+    'active',
+    'clearButton',
+    'dividersIos',
+    'errorMessageForce',
+    'fill',
+    'inset',
+    'large',
+    'mediaList',
+    'medium',
+    'strong',
+  ])
+
   const cleanProps = props =>
     Object.fromEntries(
-      Object.entries(props).filter(([, value]) => typeof value !== 'boolean' && value !== undefined)
+      Object.entries(props).filter(
+        ([key, value]) =>
+          value !== undefined && !(typeof value === 'boolean' && frameworkOnlyBooleanProps.has(key))
+      )
     )
 
   const wrap = Component => {
     const Wrapped = ({ children, ...props }) => <Component {...cleanProps(props)}>{children}</Component>
-    Wrapped.displayName = `Mock${String(Component)}`
+    const componentName =
+      typeof Component === 'string' ? Component : Component.displayName || Component.name || 'Component'
+    Wrapped.displayName = `Mock${componentName}`
     return Wrapped
   }
 
