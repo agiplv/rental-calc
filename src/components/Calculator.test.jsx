@@ -3,21 +3,26 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('framework7-react', () => {
-  const frameworkOnlyBooleanProps = new Set([
+  const frameworkOnlyProps = new Set([
     'accordionItem',
+    'bottom',
     'clearButton',
     'deleteable',
     'mediaList',
     'noMarginBottom',
     'noMarginTop',
+    'small',
+    'tabbar',
+    'tabLink',
     'tabActive',
+    'tabLinkActive',
   ])
 
   const cleanProps = props =>
     Object.fromEntries(
       Object.entries(props).filter(
         ([key, value]) =>
-          value !== undefined && !(typeof value === 'boolean' && frameworkOnlyBooleanProps.has(key))
+          value !== undefined && !frameworkOnlyProps.has(key)
       )
     )
 
@@ -111,11 +116,10 @@ describe('Calculator', () => {
     expect(screen.getByText('Monthly summary')).toBeInTheDocument()
   })
 
-  it('shows validation feedback for invalid room list input', async () => {
+  it('shows validation feedback for invalid percentage input', async () => {
     render(<Calculator />)
 
-    fireEvent.input(screen.getByLabelText('Add room area'), { target: { value: 'invalid' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Add' }))
+    fireEvent.input(screen.getByLabelText('Tax'), { target: { value: '100' } })
 
     await act(async () => {
       vi.advanceTimersByTime(350)
