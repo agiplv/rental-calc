@@ -1,8 +1,6 @@
-import React from 'react'
-import { act } from 'react'
+import React, { Fragment, act } from 'react'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { Fragment } from 'react'
 
 vi.mock('framework7-react', () => {
   const cleanProps = props =>
@@ -12,7 +10,7 @@ vi.mock('framework7-react', () => {
 
   const wrap = Component => {
     const Wrapped = ({ children, ...props }) => <Component {...cleanProps(props)}>{children}</Component>
-    Wrapped.displayName = `Mock${Component}`
+    Wrapped.displayName = `Mock${String(Component)}`
     return Wrapped
   }
 
