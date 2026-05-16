@@ -110,9 +110,9 @@ describe('Calculator', () => {
       vi.advanceTimersByTime(350)
     })
 
-    expect(screen.getByText('Rooms')).toBeInTheDocument()
-    expect(screen.getByText('Results')).toBeInTheDocument()
-    expect(screen.getByText('Details')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Rooms' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Results' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Details' })).toBeInTheDocument()
     expect(screen.getByText('Summary')).toBeInTheDocument()
     expect(screen.getAllByText('Total due').length).toBeGreaterThan(0)
   })
@@ -139,7 +139,7 @@ describe('Calculator', () => {
 
     expect(screen.getByText('20 m²')).toBeInTheDocument()
     expect(screen.getByText('10 m²')).toBeInTheDocument()
-    expect(screen.getByText('30.00 m²')).toBeInTheDocument()
+    expect(screen.getAllByText('30.00 m²').length).toBeGreaterThan(0)
   })
 
   it('shows validation feedback for invalid percentage input', async () => {
