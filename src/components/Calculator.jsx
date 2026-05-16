@@ -50,6 +50,12 @@ function toNumber(value, fallback = 0) {
   return Number.isFinite(numeric) ? numeric : fallback
 }
 
+function parseNewRoomValue(value) {
+  const normalized = (value || '').replace(/[^0-9.]/g, '').trim()
+  const numeric = Number(normalized)
+  return Number.isFinite(numeric) && numeric > 0 ? numeric : null
+}
+
 function validateInputs(monthlyFee, tax, profit, investment, minProfit, sizeWeight) {
   if (toNumber(monthlyFee, DEFAULTS.monthlyFee) < 0) {
     return 'Monthly fees must be zero or higher.'
@@ -92,6 +98,7 @@ export default function Calculator() {
     () => parsedRooms.reduce((sum, area) => sum + area, 0),
     [parsedRooms]
   )
+  const canAddRoom = useMemo(() => parseNewRoomValue(newRoomText) !== null, [newRoomText])
   const formStatusMessage = roomsError || validationError
 
   useEffect(() => {
@@ -148,9 +155,8 @@ export default function Calculator() {
   }
 
   function addRoomFromInput() {
-    const normalized = (newRoomText || '').replace(/[^0-9.]/g, '').trim()
-    const val = Number(normalized)
-    if (!Number.isFinite(val) || val <= 0) return
+    const val = parseNewRoomValue(newRoomText)
+    if (val === null) return
     const next = parsedRooms.concat(val)
     setRoomsText(next.join(', '))
     setNewRoomText('')
@@ -219,14 +225,17 @@ export default function Calculator() {
               }}
             />
             <ListItem>
-              <Button small onClick={addRoomFromInput}>
-                Add room
+              <Button
+                fill
+                large
+                className="calc-add-room-button"
+                disabled={!canAddRoom}
+                onClick={addRoomFromInput}
+              >
+                <i className="icon f7-icons">plus_circle_fill</i>
+                <span>Add room</span>
               </Button>
             </ListItem>
-            <ListItem
-              title="How to add rooms"
-              footer="Enter a room size and tap Add room (or press Enter). Repeat for each room."
-            />
             <ListItem title="Total area">
               <span slot="after" className="text-color-black">{formatArea(roomsTotalArea)}</span>
             </ListItem>
