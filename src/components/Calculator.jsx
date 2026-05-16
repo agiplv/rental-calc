@@ -134,19 +134,17 @@ export default function Calculator() {
 
   return (
     <>
-      <Toolbar bottom tabbar tabbarLabels>
+      <Toolbar bottom tabbar>
         <Link
           tabLink="#tab-inputs"
           tabLinkActive={activeTab === 'inputs'}
           onClick={() => setActiveTab('inputs')}
-          iconF7="slider_horizontal_3"
-          text="Inputs"
+          text="Calculator"
         />
         <Link
           tabLink="#tab-results"
           tabLinkActive={activeTab === 'results'}
           onClick={() => setActiveTab('results')}
-          iconF7="chart_bar_alt_fill"
           text="Results"
         />
       </Toolbar>
