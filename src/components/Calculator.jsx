@@ -310,27 +310,7 @@ export default function Calculator() {
 
           {result && (
             <>
-              <Block strong inset>
-                <div className="calc-kpi-grid">
-                  <div className="calc-kpi">
-                    <div className="calc-kpi-label">Net profit</div>
-                    <div className="calc-kpi-value">{formatMoney(result.netProfit)}</div>
-                  </div>
-                  <div className="calc-kpi">
-                    <div className="calc-kpi-label">Target profit</div>
-                    <div className="calc-kpi-value">{formatMoney(result.monthlyTargetProfit)}</div>
-                  </div>
-                  <div className="calc-kpi">
-                    <div className="calc-kpi-label">Rent price</div>
-                    <div className="calc-kpi-value">{formatMoney(result.pricePerSqM, '€/m²')}</div>
-                  </div>
-                  <div className="calc-kpi">
-                    <div className="calc-kpi-label">Total due</div>
-                    <div className="calc-kpi-value">{formatMoney(result.totalMonthlyIncomeBeforeTax)}</div>
-                  </div>f
-                </div>
-                {/* helper text moved into Monthly summary list below */}
-              </Block>
+              {/* KPI tiles moved into Monthly summary below */}
 
               <BlockHeader medium>Monthly summary</BlockHeader>
               <List inset strong dividersIos>
@@ -342,6 +322,10 @@ export default function Calculator() {
                       : 'Increase rent or lower costs to reach the requested monthly return.'
                   }
                 />
+                <ListItem title="Net profit" after={formatMoney(result.netProfit)} />
+                <ListItem title="Target profit" after={formatMoney(result.monthlyTargetProfit)} />
+                <ListItem title="Rent price" after={formatMoney(result.pricePerSqM, '€/m²')} />
+                <ListItem title="Total due" after={formatMoney(result.totalMonthlyIncomeBeforeTax)} />
                 <ListItem title="Total area" after={formatArea(result.roomsTotalArea)} />
                 <ListItem title="Estimated income before tax" after={formatMoney(result.totalMonthlyIncomeBeforeTax)} />
                 <ListItem title="Monthly fees" after={formatMoney(result.totalFees)} />
