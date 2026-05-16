@@ -15,6 +15,8 @@ import {
   Segmented,
   Tab,
   Tabs,
+  Toolbar,
+  Link,
 } from 'framework7-react'
 import { calculateRentalPrices } from '../calc'
 
@@ -178,22 +180,7 @@ export default function Calculator() {
 
   return (
     <>
-      <Segmented strong className="calc-segmented">
-        <Button
-          active={activeTab === 'inputs'}
-          onClick={() => setActiveTab('inputs')}
-          type="button"
-        >
-          Inputs
-        </Button>
-        <Button
-          active={activeTab === 'results'}
-          onClick={() => setActiveTab('results')}
-          type="button"
-        >
-          Results
-        </Button>
-      </Segmented>
+      {/* Tabs are controlled by `activeTab`; toolbar below provides quick access */}
 
       <Tabs>
         <Tab id="tab-inputs" tabActive={activeTab === 'inputs'} className="page-content calc-shell">
@@ -423,6 +410,28 @@ export default function Calculator() {
           )}
         </Tab>
       </Tabs>
+
+      <Toolbar bottom tabbar>
+        <Link
+          tabLink="#tab-inputs"
+          tabLinkActive
+          onClick={() => setActiveTab('inputs')}
+        >
+          <i className="icon f7-icons">square_list</i>
+          <span className="toolbar-label">Inputs</span>
+        </Link>
+        <Link
+          tabLink="#tab-results"
+          onClick={() => setActiveTab('results')}
+        >
+          <i className="icon f7-icons">chart_bar</i>
+          <span className="toolbar-label">Results</span>
+        </Link>
+        <Link onClick={() => null}>
+          <i className="icon f7-icons">gear_alt_fill</i>
+          <span className="toolbar-label">More</span>
+        </Link>
+      </Toolbar>
     </>
   )
 }
