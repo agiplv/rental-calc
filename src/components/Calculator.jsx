@@ -329,15 +329,19 @@ export default function Calculator() {
                     <div className="calc-kpi-value">{formatMoney(result.totalMonthlyIncomeBeforeTax)}</div>
                   </div>f
                 </div>
-                <div className="calc-helper-text">
-                  {result.isGoalAchieved
-                    ? 'The current pricing reaches the requested monthly return.'
-                    : 'Increase rent or lower costs to reach the requested monthly return.'}
-                </div>
+                {/* helper text moved into Monthly summary list below */}
               </Block>
 
               <BlockHeader medium>Monthly summary</BlockHeader>
               <List inset strong dividersIos>
+                <ListItem
+                  title="Status"
+                  after={
+                    result.isGoalAchieved
+                      ? 'The current pricing reaches the requested monthly return.'
+                      : 'Increase rent or lower costs to reach the requested monthly return.'
+                  }
+                />
                 <ListItem title="Total area" after={formatArea(result.roomsTotalArea)} />
                 <ListItem title="Estimated income before tax" after={formatMoney(result.totalMonthlyIncomeBeforeTax)} />
                 <ListItem title="Monthly fees" after={formatMoney(result.totalFees)} />
