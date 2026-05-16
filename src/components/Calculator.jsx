@@ -160,7 +160,7 @@ export default function Calculator() {
               placeholder="48, 34, 14, 10"
               type="textarea"
               resizable={false}
-              inputProps={{ rows: 2 }}
+              inputProps={{ rows: 1 }}
               info="Use commas, semicolons, or line breaks."
               value={roomsText}
               onInput={e => setRoomsText(e.target.value)}
