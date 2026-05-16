@@ -217,11 +217,12 @@ export default function Calculator() {
                   }
                 },
               }}
-            >
-              <Button slot="after" small onClick={addRoomFromInput}>
+            />
+            <ListItem>
+              <Button small onClick={addRoomFromInput}>
                 Add room
               </Button>
-            </ListInput>
+            </ListItem>
             <ListItem
               title="How to add rooms"
               footer="Enter a room size and tap Add room (or press Enter). Repeat for each room."
