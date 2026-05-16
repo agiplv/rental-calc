@@ -103,24 +103,16 @@ describe('Calculator', () => {
     vi.useRealTimers()
   })
 
-  it('shows results tab content when switching from toolbar', async () => {
-    const { container } = render(<Calculator />)
+  it('shows inputs and results content in one combined view', async () => {
+    render(<Calculator />)
 
     await act(async () => {
       vi.advanceTimersByTime(350)
     })
 
-    const inputsTab = container.querySelector('#tab-inputs')
-    const resultsTab = container.querySelector('#tab-results')
-
-    expect(inputsTab).toHaveClass('tab-active')
-    expect(resultsTab).not.toHaveClass('tab-active')
-
-    fireEvent.click(screen.getByRole('button', { name: /results/i }))
-
-    expect(inputsTab).not.toHaveClass('tab-active')
-    expect(resultsTab).toHaveClass('tab-active')
-    expect(screen.getByText('Details')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Rooms' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Results' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Details' })).toBeInTheDocument()
     expect(screen.getByText('Summary')).toBeInTheDocument()
     expect(screen.getAllByText('Total due').length).toBeGreaterThan(0)
   })
@@ -147,7 +139,7 @@ describe('Calculator', () => {
 
     expect(screen.getByText('20 m²')).toBeInTheDocument()
     expect(screen.getByText('10 m²')).toBeInTheDocument()
-    expect(screen.getByText('30.00 m²')).toBeInTheDocument()
+    expect(screen.getAllByText('30.00 m²').length).toBeGreaterThan(0)
   })
 
   it('shows validation feedback for invalid percentage input', async () => {
@@ -159,7 +151,6 @@ describe('Calculator', () => {
       vi.advanceTimersByTime(350)
     })
 
-    fireEvent.click(screen.getByRole('button', { name: /results/i }))
     expect(screen.getByText('Check your inputs')).toBeInTheDocument()
   })
 
