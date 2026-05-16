@@ -4,15 +4,18 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('framework7-react', () => {
   const frameworkSpecificProps = new Set([
+    'animated',
     'accordionItem',
     'bottom',
     'clearButton',
     'deleteable',
     'fill',
+    'labels',
     'large',
     'mediaList',
     'noMarginBottom',
     'noMarginTop',
+    'position',
     'small',
     'swipeable',
     'tabbar',
@@ -35,7 +38,28 @@ vi.mock('framework7-react', () => {
     return Wrapped
   }
 
-  const TabContext = React.createContext({ activeTab: null, setActiveTab: () => {} })
+  const TAB_STORE_KEY = '__f7MockTabStore'
+  const tabStore = globalThis[TAB_STORE_KEY] || {
+    currentTab: '#tab-calc',
+    subscribers: new Set(),
+  }
+  globalThis[TAB_STORE_KEY] = tabStore
+
+  const setCurrentTab = tab => {
+    tabStore.currentTab = tab
+    tabStore.subscribers.forEach(subscriber => subscriber(tab))
+  }
+
+  const useTabState = () => {
+    const [activeTab, setActiveTab] = React.useState(tabStore.currentTab)
+
+    React.useEffect(() => {
+      tabStore.subscribers.add(setActiveTab)
+      return () => tabStore.subscribers.delete(setActiveTab)
+    }, [])
+
+    return { activeTab, setActiveTab: setCurrentTab }
+  }
 
   return {
     AccordionContent: ({ children }) => <Fragment>{children}</Fragment>,
@@ -52,7 +76,7 @@ vi.mock('framework7-react', () => {
     CardHeader: wrap('div'),
     Chip: ({ text }) => <span>{text}</span>,
     Link: ({ children, onClick, tabLink, tabLinkActive, ...props }) => {
-      const { setActiveTab } = React.useContext(TabContext)
+      const { setActiveTab } = useTabState()
       return (
         <button
           type="button"
@@ -94,23 +118,19 @@ vi.mock('framework7-react', () => {
         {children}
       </div>
     ),
-    Tab: ({ children, id, tabActive, className }) => {
-      const { activeTab } = React.useContext(TabContext)
+    Tab: ({ children, id, tabActive, className, onTabShow }) => {
+      const { activeTab } = useTabState()
       const isActive = tabActive || activeTab === `#${id}`
+      React.useEffect(() => {
+        if (isActive) onTabShow?.()
+      }, [isActive, onTabShow])
       return (
         <div id={id} className={`tab ${className || ''} ${isActive ? 'tab-active' : ''}`.trim()}>
           {isActive ? children : null}
         </div>
       )
     },
-    Tabs: ({ children, ...props }) => {
-      const [activeTab, setActiveTab] = React.useState('#tab-calc')
-      return (
-        <TabContext.Provider value={{ activeTab, setActiveTab }}>
-          <div {...cleanProps(props)}>{children}</div>
-        </TabContext.Provider>
-      )
-    },
+    Tabs: ({ children, ...props }) => <div {...cleanProps(props)}>{children}</div>,
     Toolbar: wrap('div'),
   }
 })
@@ -120,6 +140,10 @@ import Calculator from './Calculator'
 describe('Calculator', () => {
   beforeEach(() => {
     localStorage.clear()
+    if (globalThis.__f7MockTabStore) {
+      globalThis.__f7MockTabStore.currentTab = '#tab-calc'
+      globalThis.__f7MockTabStore.subscribers.clear()
+    }
     vi.useFakeTimers()
   })
 
