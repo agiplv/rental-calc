@@ -311,22 +311,10 @@ export default function Calculator() {
 
               <BlockHeader medium>Monthly summary</BlockHeader>
               <List inset strong dividersIos>
-                <ListItem
-                  title="Status"
-                  after={
-                    result.isGoalAchieved
-                      ? 'The current pricing reaches the requested monthly return.'
-                      : 'Increase rent or lower costs to reach the requested monthly return.'
-                  }
-                />
-                <ListItem>
-                  <div className="calc-kpi-inline">
-                    <Chip className="calc-kpi-chip" text={`Net ${formatMoney(result.netProfit)}`} />
-                    <Chip className="calc-kpi-chip" text={`Target ${formatMoney(result.monthlyTargetProfit)}`} />
-                    <Chip className="calc-kpi-chip" text={`Rent ${formatMoney(result.pricePerSqM, '€/m²')}`} />
-                    <Chip className="calc-kpi-chip" text={`Due ${formatMoney(result.totalMonthlyIncomeBeforeTax)}`} />
-                  </div>
-                </ListItem>
+                <ListItem title="Net profit" after={formatMoney(result.netProfit)} />
+                <ListItem title="Target profit" after={formatMoney(result.monthlyTargetProfit)} />
+                <ListItem title="Rent price" after={formatMoney(result.pricePerSqM, '€/m²')} />
+                <ListItem title="Total due" after={formatMoney(result.totalMonthlyIncomeBeforeTax)} />
                 <ListItem title="Total area" after={formatArea(result.roomsTotalArea)} />
                 <ListItem title="Monthly fees" after={formatMoney(result.totalFees)} />
                 <ListItem title="Tax paid" after={formatMoney(result.totalTaxPaid)} />
@@ -395,10 +383,7 @@ export default function Calculator() {
           <i className="icon f7-icons">chart_bar</i>
           <span className="toolbar-label">Results</span>
         </Link>
-        <Link onClick={() => null}>
-          <i className="icon f7-icons">gear_alt_fill</i>
-          <span className="toolbar-label">More</span>
-        </Link>
+        {/* Removed 'More' action to keep toolbar minimal for iOS UX */}
       </Toolbar>
     </>
   )
