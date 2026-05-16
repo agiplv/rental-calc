@@ -36,6 +36,11 @@ function formatPercent(value) {
   return `${Number(value).toFixed(1)}%`
 }
 
+function formatRate(value) {
+  if (!Number.isFinite(value)) return 'N/A'
+  return formatMoney(value, '€/m²')
+}
+
 function parseRooms(text) {
   if (!text) return []
   return text
@@ -364,33 +369,43 @@ export default function Calculator() {
 
           {result && (
             <>
-              {/* KPI tiles moved into Monthly summary below */}
-
-              <BlockTitle medium>Monthly summary</BlockTitle>
+              <BlockTitle medium>Details</BlockTitle>
               <List className="list-strong list-dividers inset-ios">
-                <ListItem title="Net profit">
-                  <span slot="after" className="text-color-black font-weight-bold">{formatMoney(result.netProfit)}</span>
-                </ListItem>
-                <ListItem title="Target profit">
-                  <span slot="after" className="text-color-black">{formatMoney(result.monthlyTargetProfit)}</span>
-                </ListItem>
-                <ListItem title="Rent price">
-                  <span slot="after" className="text-color-black">{formatMoney(result.pricePerSqM, '€/m²')}</span>
-                </ListItem>
-                <ListItem title="Total due">
-                  <span slot="after" className="text-color-black">{formatMoney(result.totalMonthlyIncomeBeforeTax)}</span>
-                </ListItem>
-                <ListItem title="Total area">
-                  <span slot="after" className="text-color-black">{formatArea(result.roomsTotalArea)}</span>
-                </ListItem>
-                <ListItem title="Monthly fees">
-                  <span slot="after" className="text-color-black">{formatMoney(result.totalFees)}</span>
-                </ListItem>
-                <ListItem title="Tax paid">
-                  <span slot="after" className="text-color-black">{formatMoney(result.totalTaxPaid)}</span>
-                </ListItem>
-                <ListItem title="Fees per m²">
-                  <span slot="after" className="text-color-black">{formatMoney(result.monthlyFeePerSqM, '€/m²')}</span>
+                <ListItem
+                  accordionItem
+                  title="Summary"
+                  after={formatMoney(result.totalMonthlyIncomeBeforeTax)}
+                  subtitle={`${formatMoney(result.netProfit)} net profit`}
+                  footer={`${formatMoney(result.pricePerSqM, '€/m²')} rent price`}
+                >
+                  <AccordionContent>
+                    <List className="list-strong list-dividers inset-ios no-margin-top no-margin-bottom">
+                      <ListItem title="Total due">
+                        <span slot="after" className="text-color-black font-weight-bold">{formatMoney(result.totalMonthlyIncomeBeforeTax)}</span>
+                      </ListItem>
+                      <ListItem title="Net profit">
+                        <span slot="after" className="text-color-black">{formatMoney(result.netProfit)}</span>
+                      </ListItem>
+                      <ListItem title="Target profit">
+                        <span slot="after" className="text-color-black">{formatMoney(result.monthlyTargetProfit)}</span>
+                      </ListItem>
+                      <ListItem title="Rent price">
+                        <span slot="after" className="text-color-black">{formatMoney(result.pricePerSqM, '€/m²')}</span>
+                      </ListItem>
+                      <ListItem title="Total area">
+                        <span slot="after" className="text-color-black">{formatArea(result.roomsTotalArea)}</span>
+                      </ListItem>
+                      <ListItem title="Monthly fees">
+                        <span slot="after" className="text-color-black">{formatMoney(result.totalFees)}</span>
+                      </ListItem>
+                      <ListItem title="Tax paid">
+                        <span slot="after" className="text-color-black">{formatMoney(result.totalTaxPaid)}</span>
+                      </ListItem>
+                      <ListItem title="Fees per m²">
+                        <span slot="after" className="text-color-black">{formatMoney(result.monthlyFeePerSqM, '€/m²')}</span>
+                      </ListItem>
+                    </List>
+                  </AccordionContent>
                 </ListItem>
               </List>
 
@@ -398,13 +413,14 @@ export default function Calculator() {
               <List className="list-strong list-dividers media-list">
                 {result.rows.map(row => {
                   const areaShare = result.roomsTotalArea > 0 ? (row.area / result.roomsTotalArea) * 100 : 0
+                  const totalRatePerSqM = row.area > 0 ? row.total / row.area : null
 
                   return (
                     <ListItem
                       accordionItem
                       key={row.index}
                       after={formatMoney(row.total)}
-                      footer={`${formatMoney(row.total / row.area, '€/m²')} total`}
+                      footer={`${formatRate(totalRatePerSqM)} total rate`}
                       subtitle={`${formatArea(row.area)} · ${formatPercent(areaShare)} of total area`}
                       title={`Room ${row.index}`}
                     >
@@ -418,6 +434,9 @@ export default function Calculator() {
                           </ListItem>
                           <ListItem title="Fees portion">
                             <span slot="after" className="text-color-black">{formatMoney(row.fee)}</span>
+                          </ListItem>
+                          <ListItem title="Rate">
+                            <span slot="after" className="text-color-black">{formatRate(totalRatePerSqM)}</span>
                           </ListItem>
                           <ListItem title="Share of total area">
                             <span slot="after" className="text-color-black">{formatPercent(areaShare)}</span>
