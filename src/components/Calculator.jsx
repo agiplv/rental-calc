@@ -24,6 +24,7 @@ const DEFAULTS = {
   profit: 15,
   investment: 25000,
   minProfit: 100,
+  sizeWeight: 0,
 }
 
 function formatMoney(value, suffix = '€') {
@@ -52,7 +53,7 @@ function toNumber(value, fallback = 0) {
   return Number.isFinite(numeric) ? numeric : fallback
 }
 
-function validateInputs(monthlyFee, tax, profit, investment, minProfit) {
+function validateInputs(monthlyFee, tax, profit, investment, minProfit, sizeWeight) {
   if (toNumber(monthlyFee, DEFAULTS.monthlyFee) < 0) {
     return 'Monthly fees must be zero or higher.'
   }
@@ -68,6 +69,9 @@ function validateInputs(monthlyFee, tax, profit, investment, minProfit) {
   if (toNumber(minProfit, DEFAULTS.minProfit) < 0) {
     return 'Minimum monthly profit must be zero or higher.'
   }
+  if (toNumber(sizeWeight, DEFAULTS.sizeWeight) < 0 || toNumber(sizeWeight, DEFAULTS.sizeWeight) > 10) {
+    return 'Size weighting must be between 0 and 10.'
+  }
   return ''
 }
 
@@ -80,6 +84,7 @@ export default function Calculator() {
   const [profit, setProfit] = useState(DEFAULTS.profit)
   const [investment, setInvestment] = useState(DEFAULTS.investment)
   const [minProfit, setMinProfit] = useState(DEFAULTS.minProfit)
+  const [sizeWeight, setSizeWeight] = useState(DEFAULTS.sizeWeight)
   const [result, setResult] = useState(null)
   const [roomsError, setRoomsError] = useState('')
   const [validationError, setValidationError] = useState('')
@@ -103,6 +108,7 @@ export default function Calculator() {
       setProfit((data.profit ?? DEFAULTS.profit / 100) * 100)
       setInvestment(data.investment ?? DEFAULTS.investment)
       setMinProfit(data.minProfit ?? DEFAULTS.minProfit)
+      setSizeWeight(data.sizeWeight ?? DEFAULTS.sizeWeight)
     } catch {
       localStorage.removeItem('pea-rental-calc')
     }
@@ -114,14 +120,15 @@ export default function Calculator() {
     t = toNumber(tax, DEFAULTS.tax) / 100,
     p = toNumber(profit, DEFAULTS.profit) / 100,
     inv = toNumber(investment, DEFAULTS.investment),
-    minP = toNumber(minProfit, DEFAULTS.minProfit)
+    minP = toNumber(minProfit, DEFAULTS.minProfit),
+    sw = toNumber(sizeWeight, DEFAULTS.sizeWeight)
   ) {
     if (!roomsArray || roomsArray.length === 0) {
       setResult(null)
       return
     }
 
-    const calculation = calculateRentalPrices(roomsArray, mFee, t, p, inv, minP)
+    const calculation = calculateRentalPrices(roomsArray, mFee, t, p, inv, minP, sw)
     if (!calculation || !Number.isFinite(calculation.totalMonthlyIncomeBeforeTax)) {
       setValidationError('Please review the inputs to keep calculations within valid ranges.')
       setResult(null)
@@ -138,6 +145,7 @@ export default function Calculator() {
         profit: p,
         investment: inv,
         minProfit: minP,
+        sizeWeight: sw,
       })
     )
   }
@@ -153,7 +161,7 @@ export default function Calculator() {
         return
       }
 
-      const nextValidationError = validateInputs(monthlyFee, tax, profit, investment, minProfit)
+      const nextValidationError = validateInputs(monthlyFee, tax, profit, investment, minProfit, sizeWeight)
       setRoomsError('')
 
       if (nextValidationError) {
@@ -169,7 +177,8 @@ export default function Calculator() {
         toNumber(tax, DEFAULTS.tax) / 100,
         toNumber(profit, DEFAULTS.profit) / 100,
         toNumber(investment, DEFAULTS.investment),
-        toNumber(minProfit, DEFAULTS.minProfit)
+        toNumber(minProfit, DEFAULTS.minProfit),
+        toNumber(sizeWeight, DEFAULTS.sizeWeight)
       )
     }, 300)
 
@@ -284,6 +293,18 @@ export default function Calculator() {
               type="number"
               value={minProfit}
               onInput={event => setMinProfit(event.target.value)}
+            />
+            <ListInput
+              clearButton
+              inputmode="decimal"
+              label="Size weighting (k)"
+              min="0"
+              max="10"
+              placeholder="0"
+              step="0.01"
+              type="number"
+              value={sizeWeight}
+              onInput={event => setSizeWeight(event.target.value)}
             />
           </List>
 
