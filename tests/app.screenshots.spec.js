@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 test('captures the main calculator flow in iOS mode', async ({ page }, testInfo) => {
   await page.goto('/')
 
-  await expect(page.getByText('Setup overview')).toBeVisible()
+  await expect(page.getByText('Rooms')).toBeVisible()
 
   await testInfo.attach('inputs-view', {
     body: await page.screenshot({ fullPage: true }),
