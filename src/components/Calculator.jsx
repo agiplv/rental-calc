@@ -77,6 +77,7 @@ function validateInputs(monthlyFee, tax, profit, investment, minProfit) {
 export default function Calculator() {
   const [activeTab, setActiveTab] = useState('inputs')
   const [roomsText, setRoomsText] = useState(DEFAULTS.roomsText)
+  const [newRoomText, setNewRoomText] = useState('')
   const [monthlyFee, setMonthlyFee] = useState(DEFAULTS.monthlyFee)
   const [tax, setTax] = useState(DEFAULTS.tax)
   const [profit, setProfit] = useState(DEFAULTS.profit)
@@ -186,20 +187,49 @@ export default function Calculator() {
         <Tab id="tab-inputs" tabActive={activeTab === 'inputs'} className="page-content calc-shell">
 
           <BlockHeader medium>Rooms</BlockHeader>
-          <List inset strong dividersIos>
-            <ListInput
-              clearButton
-              errorMessage={roomsError}
-              errorMessageForce={Boolean(roomsError)}
-              info="Use commas, semicolons, or line breaks."
-              inputProps={{ rows: 1 }}
-              label="Room areas"
-              placeholder="48, 34, 14, 10"
-              type="textarea"
-              value={roomsText}
-              onInput={event => setRoomsText(event.target.value)}
-            />
-          </List>
+          <Block strong inset>
+            <div className="calc-room-chips">
+              {parsedRooms.map((area, index) => (
+                <Chip
+                  key={`${area}-${index}`}
+                  text={`${area} m²`}
+                  close
+                  onClick={() => {
+                    const next = parsedRooms.filter((_, i) => i !== index)
+                    setRoomsText(next.join(', '))
+                  }}
+                />
+              ))}
+            </div>
+
+            <List inset>
+              <ListInput
+                clearButton
+                label="Add room"
+                placeholder="Type size and press Enter"
+                type="text"
+                value={newRoomText}
+                onInput={event => setNewRoomText(event.target.value)}
+                onKeyDown={event => {
+                  if (event.key === 'Enter' || event.key === ',') {
+                    event.preventDefault()
+                    const normalized = (newRoomText || '').replace(/[^0-9.]/g, '').trim()
+                    const val = Number(normalized)
+                    if (Number.isFinite(val) && val > 0) {
+                      const next = parsedRooms.concat(val)
+                      setRoomsText(next.join(', '))
+                      setNewRoomText('')
+                    }
+                  }
+                }}
+              />
+            </List>
+            {roomsError ? (
+              <div className="calc-helper-text text-color-red">{roomsError}</div>
+            ) : (
+              <div className="calc-helper-text">Use commas, semicolons, or press Enter to add.</div>
+            )}
+          </Block>
 
           <BlockHeader medium>Costs and taxes</BlockHeader>
           <List inset strong dividersIos>
