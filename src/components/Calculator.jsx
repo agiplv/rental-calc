@@ -322,15 +322,17 @@ export default function Calculator() {
                       : 'Increase rent or lower costs to reach the requested monthly return.'
                   }
                 />
-                <ListItem title="Net profit" after={formatMoney(result.netProfit)} />
-                <ListItem title="Target profit" after={formatMoney(result.monthlyTargetProfit)} />
-                <ListItem title="Rent price" after={formatMoney(result.pricePerSqM, '€/m²')} />
-                <ListItem title="Total due" after={formatMoney(result.totalMonthlyIncomeBeforeTax)} />
+                <ListItem
+                  title="KPIs"
+                  subtitle={`Net: ${formatMoney(result.netProfit)} · Target: ${formatMoney(
+                    result.monthlyTargetProfit
+                  )} · Rent: ${formatMoney(result.pricePerSqM, '€/m²')} · Due: ${formatMoney(
+                    result.totalMonthlyIncomeBeforeTax
+                  )}`}
+                />
                 <ListItem title="Total area" after={formatArea(result.roomsTotalArea)} />
-                <ListItem title="Estimated income before tax" after={formatMoney(result.totalMonthlyIncomeBeforeTax)} />
                 <ListItem title="Monthly fees" after={formatMoney(result.totalFees)} />
                 <ListItem title="Tax paid" after={formatMoney(result.totalTaxPaid)} />
-                <ListItem title="Total rent" after={formatMoney(result.totalRent)} />
                 <ListItem title="Fees per m²" after={formatMoney(result.monthlyFeePerSqM, '€/m²')} />
               </List>
 
