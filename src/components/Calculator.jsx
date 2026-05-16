@@ -184,36 +184,6 @@ export default function Calculator() {
 
       <Tabs>
         <Tab id="tab-inputs" tabActive={activeTab === 'inputs'} className="page-content calc-shell">
-          <Card className="calc-overview-card">
-            <CardHeader>Setup overview</CardHeader>
-            <CardContent>
-              <div className="calc-kpi-grid">
-                <div className="calc-kpi">
-                  <div className="calc-kpi-label">Rooms</div>
-                  <div className="calc-kpi-value">{parsedRooms.length}</div>
-                </div>
-                <div className="calc-kpi">
-                  <div className="calc-kpi-label">Total area</div>
-                  <div className="calc-kpi-value">{formatArea(roomsTotalArea)}</div>
-                </div>
-              </div>
-
-              <div className="calc-helper-text">
-                Results update automatically and stay saved on this device for the next visit.
-              </div>
-
-              {parsedRooms.length > 0 && (
-                <div className="calc-room-chips">
-                  {parsedRooms.map((area, index) => (
-                    <Chip key={`${area}-${index}`} text={`Room ${index + 1} · ${formatArea(area)}`} />
-                  ))}
-                </div>
-              )}
-            </CardContent>
-            <CardFooter className={formStatusMessage ? 'text-color-red' : 'calc-helper-text'}>
-              {formStatusMessage || 'Use room sizes in square meters and refine the assumptions below.'}
-            </CardFooter>
-          </Card>
 
           <BlockHeader medium>Rooms</BlockHeader>
           <List inset strong dividersIos>
@@ -324,36 +294,31 @@ export default function Calculator() {
 
           {result && (
             <>
-              <Card className="calc-status-card">
-                <CardHeader className={result.isGoalAchieved ? 'text-color-green' : 'text-color-orange'}>
-                  {result.isGoalAchieved ? 'Goal achieved' : 'Goal needs adjustment'}
-                </CardHeader>
-                <CardContent>
-                  <div className="calc-kpi-grid">
-                    <div className="calc-kpi">
-                      <div className="calc-kpi-label">Net profit</div>
-                      <div className="calc-kpi-value">{formatMoney(result.netProfit)}</div>
-                    </div>
-                    <div className="calc-kpi">
-                      <div className="calc-kpi-label">Target profit</div>
-                      <div className="calc-kpi-value">{formatMoney(result.monthlyTargetProfit)}</div>
-                    </div>
-                    <div className="calc-kpi">
-                      <div className="calc-kpi-label">Rent price</div>
-                      <div className="calc-kpi-value">{formatMoney(result.pricePerSqM, '€/m²')}</div>
-                    </div>
-                    <div className="calc-kpi">
-                      <div className="calc-kpi-label">Total due</div>
-                      <div className="calc-kpi-value">{formatMoney(result.totalMonthlyIncomeBeforeTax)}</div>
-                    </div>
+              <Block strong inset>
+                <div className="calc-kpi-grid">
+                  <div className="calc-kpi">
+                    <div className="calc-kpi-label">Net profit</div>
+                    <div className="calc-kpi-value">{formatMoney(result.netProfit)}</div>
                   </div>
-                </CardContent>
-                <CardFooter className="calc-helper-text">
+                  <div className="calc-kpi">
+                    <div className="calc-kpi-label">Target profit</div>
+                    <div className="calc-kpi-value">{formatMoney(result.monthlyTargetProfit)}</div>
+                  </div>
+                  <div className="calc-kpi">
+                    <div className="calc-kpi-label">Rent price</div>
+                    <div className="calc-kpi-value">{formatMoney(result.pricePerSqM, '€/m²')}</div>
+                  </div>
+                  <div className="calc-kpi">
+                    <div className="calc-kpi-label">Total due</div>
+                    <div className="calc-kpi-value">{formatMoney(result.totalMonthlyIncomeBeforeTax)}</div>
+                  </div>
+                </div>
+                <div className="calc-helper-text">
                   {result.isGoalAchieved
                     ? 'The current pricing reaches the requested monthly return.'
                     : 'Increase rent or lower costs to reach the requested monthly return.'}
-                </CardFooter>
-              </Card>
+                </div>
+              </Block>
 
               <BlockHeader medium>Monthly summary</BlockHeader>
               <List inset strong dividersIos>
