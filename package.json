@@ -6,7 +6,10 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "npx serve dist"
+    "start": "npx serve dist",
+    "test": "npm run test:unit && npm run test:screenshots",
+    "test:unit": "vitest run --config vitest.config.mjs",
+    "test:screenshots": "playwright test"
   },
   "dependencies": {
     "framework7": "^9.0.4",
@@ -15,9 +18,14 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "vite": "^7.3.3",
+    "@playwright/test": "^1.60.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@vitejs/plugin-react": "^5.1.0",
-    "serve": "^14.2.0"
+    "jsdom": "^29.1.1",
+    "serve": "^14.2.0",
+    "vite": "^7.3.3",
+    "vitest": "^4.1.6"
   },
   "overrides": {
     "fast-uri": "3.1.2"

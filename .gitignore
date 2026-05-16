@@ -33,6 +33,8 @@
 
 ## Coverage
 /coverage/
+/playwright-report/
+/test-results/
 
 ## Misc
 /.cache/

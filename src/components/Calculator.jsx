@@ -195,7 +195,7 @@ export default function Calculator() {
         </Button>
       </Segmented>
 
-      <Tabs animated>
+      <Tabs>
         <Tab id="tab-inputs" tabActive={activeTab === 'inputs'} className="page-content calc-shell">
           <Card className="calc-overview-card">
             <CardHeader>Setup overview</CardHeader>
