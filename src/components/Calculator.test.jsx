@@ -36,12 +36,17 @@ vi.mock('framework7-react', () => {
 
   return {
     AccordionContent: ({ children }) => <Fragment>{children}</Fragment>,
+    AccordionItem: wrap('div'),
+    AccordionToggle: ({ children, ...props }) => <div {...cleanProps(props)}>{children}</div>,
     BlockTitle: ({ children }) => <h2>{children}</h2>,
     Button: ({ children, onClick, type = 'button', ...props }) => (
       <button type={type} onClick={onClick} {...cleanProps(props)}>
         {children}
       </button>
     ),
+    Card: wrap('div'),
+    CardContent: wrap('div'),
+    CardHeader: wrap('div'),
     Chip: ({ text }) => <span>{text}</span>,
     Link: ({ children, onClick, ...props }) => (
       <button type="button" onClick={onClick} {...cleanProps(props)}>
