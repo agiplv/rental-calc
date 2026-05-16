@@ -27,6 +27,8 @@ const DEFAULTS = {
   minProfit: 100,
   sizeWeight: 0,
 }
+const CALC_TAB = '#tab-calc'
+const RESULT_TAB = '#tab-result'
 
 function formatMoney(value, suffix = '€') {
   return `${Number(value).toFixed(2)} ${suffix}`
@@ -99,7 +101,7 @@ export default function Calculator() {
   const [result, setResult] = useState(null)
   const [roomsError, setRoomsError] = useState('')
   const [validationError, setValidationError] = useState('')
-  const [activeTab, setActiveTab] = useState('calc')
+  const [activeTab, setActiveTab] = useState(CALC_TAB)
   const debounceRef = useRef(null)
 
   const parsedRooms = useMemo(() => parseRooms(roomsText), [roomsText])
@@ -211,16 +213,16 @@ export default function Calculator() {
       <Card className="margin-top margin-horizontal margin-bottom">
         <CardContent className="padding-top">
           <Toolbar tabbar className="margin-bottom">
-            <Link tabLink="#tab-calc" tabLinkActive={activeTab === 'calc'} onClick={() => setActiveTab('calc')}>
+            <Link tabLink={CALC_TAB} tabLinkActive={activeTab === CALC_TAB} onClick={() => setActiveTab(CALC_TAB)}>
               Calc
             </Link>
-            <Link tabLink="#tab-result" tabLinkActive={activeTab === 'result'} onClick={() => setActiveTab('result')}>
+            <Link tabLink={RESULT_TAB} tabLinkActive={activeTab === RESULT_TAB} onClick={() => setActiveTab(RESULT_TAB)}>
               Result
             </Link>
           </Toolbar>
 
           <Tabs swipeable>
-            <Tab id="tab-calc" tabActive={activeTab === 'calc'}>
+            <Tab id="tab-calc" tabActive={activeTab === CALC_TAB}>
               <List className="list-strong list-dividers inset-ios">
                 <ListItem accordionItem title="Rooms">
                   <AccordionContent>
@@ -369,7 +371,7 @@ export default function Calculator() {
               </List>
             </Tab>
 
-            <Tab id="tab-result" tabActive={activeTab === 'result'}>
+            <Tab id="tab-result" tabActive={activeTab === RESULT_TAB}>
               {formStatusMessage && (
                 <List className="list-strong list-dividers inset-ios">
                   <ListItem title="Check your inputs">
