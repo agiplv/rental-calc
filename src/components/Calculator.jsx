@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
+  BlockTitle,
   AccordionContent,
-  BlockHeader,
+  Button,
   Chip,
   List,
+  ListInput,
   ListItem,
   Tab,
   Tabs,
@@ -145,6 +147,15 @@ export default function Calculator() {
     )
   }
 
+  function addRoomFromInput() {
+    const normalized = (newRoomText || '').replace(/[^0-9.]/g, '').trim()
+    const val = Number(normalized)
+    if (!Number.isFinite(val) || val <= 0) return
+    const next = parsedRooms.concat(val)
+    setRoomsText(next.join(', '))
+    setNewRoomText('')
+  }
+
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
 
@@ -178,7 +189,7 @@ export default function Calculator() {
     }, 300)
 
     return () => clearTimeout(debounceRef.current)
-  }, [roomsText, parsedRooms, monthlyFee, tax, profit, investment, minProfit])
+  }, [roomsText, parsedRooms, monthlyFee, tax, profit, investment, minProfit, sizeWeight])
 
   return (
     <>
@@ -186,192 +197,134 @@ export default function Calculator() {
 
       <Tabs>
         <Tab id="tab-inputs" tabActive={activeTab === 'inputs'} className="page-content calc-shell">
-
-          <BlockHeader medium>Rooms</BlockHeader>
+          <BlockTitle medium>Rooms</BlockTitle>
           <List className="list-strong list-dividers inset-ios">
-            <li className="item-content item-input">
-              <div className="item-inner">
-                <div className="item-title item-label">Add room area</div>
-                <div className="item-input-wrap">
-                  <input
-                    className="text-align-right"
-                    aria-label="Add room size"
-                    inputMode="decimal"
-                    min="0"
-                    placeholder="Add"
-                    step="0.01"
-                    type="number"
-                    value={newRoomText}
-                    onChange={e => setNewRoomText(e.target.value)}
-                    onKeyDown={event => {
-                      if (event.key === 'Enter' || event.key === ',') {
-                        event.preventDefault()
-                        const normalized = (newRoomText || '').replace(/[^0-9.]/g, '').trim()
-                        const val = Number(normalized)
-                        if (Number.isFinite(val) && val > 0) {
-                          const next = parsedRooms.concat(val)
-                          setRoomsText(next.join(', '))
-                          setNewRoomText('')
-                        }
-                      }
+            <ListInput
+              clearButton
+              inputmode="decimal"
+              label="Add room area"
+              placeholder="Add room area"
+              type="number"
+              value={newRoomText}
+              onInput={event => setNewRoomText(event.target.value)}
+              inputProps={{
+                min: '0',
+                step: '0.01',
+                onKeyDown: event => {
+                  if (event.key === 'Enter' || event.key === ',') {
+                    event.preventDefault()
+                    addRoomFromInput()
+                  }
+                },
+              }}
+            >
+              <Button slot="after" small onClick={addRoomFromInput}>
+                Add
+              </Button>
+            </ListInput>
+            <ListItem title="Total area">
+              <span slot="after" className="text-color-black">{formatArea(roomsTotalArea)}</span>
+            </ListItem>
+            <ListItem title="Rooms">
+              <div slot="after" className="calc-room-chips">
+                {parsedRooms.map((area, index) => (
+                  <Chip
+                    key={`${area}-${index}`}
+                    text={`${area} m²`}
+                    deleteable
+                    onDelete={() => {
+                      const next = parsedRooms.filter((_, i) => i !== index)
+                      setRoomsText(next.join(', '))
                     }}
                   />
-                  <span className="input-clear-button" />
-                </div>
-                <div className="item-after">m²</div>
+                ))}
               </div>
-            </li>
-            <li className="item-content">
-              <div className="item-inner">
-                <div className="item-input-wrap">
-                  <div className="calc-room-chips">
-                    {parsedRooms.map((area, index) => (
-                      <Chip
-                        key={`${area}-${index}`}
-                        text={`${area} m²`}
-                        deleteable
-                        onDelete={() => {
-                          const next = parsedRooms.filter((_, i) => i !== index)
-                          setRoomsText(next.join(', '))
-                        }}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div className="item-after text-color-black">{formatArea(roomsTotalArea)}</div>
-              </div>
-            </li>
+            </ListItem>
             {roomsError && (
-              <li className="item-content">
-                <div className="item-inner">
-                  <div className="item-title text-color-red">{roomsError}</div>
-                </div>
-              </li>
+              <ListItem title={roomsError}>
+                <span slot="after" className="text-color-red">!</span>
+              </ListItem>
             )}
           </List>
 
-          <BlockHeader medium>Costs and taxes</BlockHeader>
+          <BlockTitle medium>Costs and taxes</BlockTitle>
           <List className="list-strong list-dividers inset-ios">
-            <li className="item-content item-input">
-              <div className="item-inner">
-                <div className="item-title item-label">Monthly fees</div>
-                <div className="item-input-wrap">
-                  <input
-                    className="text-align-right"
-                    inputMode="decimal"
-                    min="0"
-                    placeholder="250"
-                    step="0.01"
-                    type="number"
-                    value={monthlyFee}
-                    onInput={event => setMonthlyFee(event.target.value)}
-                  />
-                  <span className="input-clear-button" />
-                </div>
-                <div className="item-after">€</div>
-              </div>
-            </li>
-            <li className="item-content item-input">
-              <div className="item-inner">
-                <div className="item-title item-label">Tax</div>
-                <div className="item-input-wrap">
-                  <input
-                    className="text-align-right"
-                    inputMode="decimal"
-                    min="0"
-                    max="99.99"
-                    placeholder="10"
-                    step="0.01"
-                    type="number"
-                    value={tax}
-                    onInput={event => setTax(event.target.value)}
-                  />
-                  <span className="input-clear-button" />
-                </div>
-                <div className="item-after">%</div>
-              </div>
-            </li>
+            <ListInput
+              clearButton
+              inputmode="decimal"
+              label="Monthly fees"
+              placeholder="250"
+              type="number"
+              value={monthlyFee}
+              onInput={event => setMonthlyFee(event.target.value)}
+              inputProps={{ min: '0', step: '0.01' }}
+            >
+              <span slot="after">€</span>
+            </ListInput>
+            <ListInput
+              clearButton
+              inputmode="decimal"
+              label="Tax"
+              placeholder="10"
+              type="number"
+              value={tax}
+              onInput={event => setTax(event.target.value)}
+              inputProps={{ min: '0', max: '99.99', step: '0.01' }}
+            >
+              <span slot="after">%</span>
+            </ListInput>
           </List>
 
-          <BlockHeader medium>Profit targets</BlockHeader>
+          <BlockTitle medium>Profit targets</BlockTitle>
           <List className="list-strong list-dividers inset-ios">
-            <li className="item-content item-input">
-              <div className="item-inner">
-                <div className="item-title item-label">Annual profit</div>
-                <div className="item-input-wrap">
-                  <input
-                    className="text-align-right"
-                    inputMode="decimal"
-                    min="0"
-                    placeholder="15"
-                    step="0.01"
-                    type="number"
-                    value={profit}
-                    onInput={event => setProfit(event.target.value)}
-                  />
-                  <span className="input-clear-button" />
-                </div>
-                <div className="item-after">%</div>
-              </div>
-            </li>
-            <li className="item-content item-input">
-              <div className="item-inner">
-                <div className="item-title item-label">Investment</div>
-                <div className="item-input-wrap">
-                  <input
-                    className="text-align-right"
-                    inputMode="decimal"
-                    min="0"
-                    placeholder="25000"
-                    step="0.01"
-                    type="number"
-                    value={investment}
-                    onInput={event => setInvestment(event.target.value)}
-                  />
-                  <span className="input-clear-button" />
-                </div>
-                <div className="item-after">€</div>
-              </div>
-            </li>
-            <li className="item-content item-input">
-              <div className="item-inner">
-                <div className="item-title item-label">Minimum monthly profit</div>
-                <div className="item-input-wrap">
-                  <input
-                    className="text-align-right"
-                    inputMode="decimal"
-                    min="0"
-                    placeholder="100"
-                    step="0.01"
-                    type="number"
-                    value={minProfit}
-                    onInput={event => setMinProfit(event.target.value)}
-                  />
-                  <span className="input-clear-button" />
-                </div>
-                <div className="item-after">€</div>
-              </div>
-            </li>
-            <li className="item-content item-input">
-              <div className="item-inner">
-                <div className="item-title item-label">Size weighting</div>
-                <div className="item-input-wrap">
-                  <input
-                    className="text-align-right"
-                    inputMode="decimal"
-                    min="0"
-                    max="10"
-                    placeholder="0"
-                    step="0.01"
-                    type="number"
-                    value={sizeWeight}
-                    onInput={event => setSizeWeight(event.target.value)}
-                  />
-                  <span className="input-clear-button" />
-                </div>
-                <div className="item-after">k</div>
-              </div>
-            </li>
+            <ListInput
+              clearButton
+              inputmode="decimal"
+              label="Annual profit"
+              placeholder="15"
+              type="number"
+              value={profit}
+              onInput={event => setProfit(event.target.value)}
+              inputProps={{ min: '0', step: '0.01' }}
+            >
+              <span slot="after">%</span>
+            </ListInput>
+            <ListInput
+              clearButton
+              inputmode="decimal"
+              label="Investment"
+              placeholder="25000"
+              type="number"
+              value={investment}
+              onInput={event => setInvestment(event.target.value)}
+              inputProps={{ min: '0', step: '0.01' }}
+            >
+              <span slot="after">€</span>
+            </ListInput>
+            <ListInput
+              clearButton
+              inputmode="decimal"
+              label="Minimum monthly profit"
+              placeholder="100"
+              type="number"
+              value={minProfit}
+              onInput={event => setMinProfit(event.target.value)}
+              inputProps={{ min: '0', step: '0.01' }}
+            >
+              <span slot="after">€</span>
+            </ListInput>
+            <ListInput
+              clearButton
+              inputmode="decimal"
+              label="Size weighting"
+              placeholder="0"
+              type="number"
+              value={sizeWeight}
+              onInput={event => setSizeWeight(event.target.value)}
+              inputProps={{ min: '0', max: '10', step: '0.01' }}
+            >
+              <span slot="after">k</span>
+            </ListInput>
           </List>
 
           {/* result preview removed — details available under Results tab */}
@@ -399,7 +352,7 @@ export default function Calculator() {
             <>
               {/* KPI tiles moved into Monthly summary below */}
 
-              <BlockHeader medium>Monthly summary</BlockHeader>
+              <BlockTitle medium>Monthly summary</BlockTitle>
               <List className="list-strong list-dividers inset-ios">
                 <ListItem title="Net profit">
                   <span slot="after" className="text-color-black font-weight-bold">{formatMoney(result.netProfit)}</span>
@@ -427,7 +380,7 @@ export default function Calculator() {
                 </ListItem>
               </List>
 
-              <BlockHeader medium>Per-room detail</BlockHeader>
+              <BlockTitle medium>Per-room detail</BlockTitle>
               <List className="list-strong list-dividers inset-ios media-list">
                 {result.rows.map(row => {
                   const areaShare = result.roomsTotalArea > 0 ? (row.area / result.roomsTotalArea) * 100 : 0
