@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import {
+  AccordionContent,
   Block,
   BlockTitle,
   Link,
@@ -158,6 +159,8 @@ export default function Calculator() {
               label="Room areas"
               placeholder="48, 34, 14, 10"
               type="textarea"
+              resizable={false}
+              inputProps={{ rows: 2 }}
               info="Use commas, semicolons, or line breaks."
               value={roomsText}
               onInput={e => setRoomsText(e.target.value)}
@@ -260,12 +263,24 @@ export default function Calculator() {
               <List inset strong dividersIos>
                 {result.rows.map(row => (
                   <ListItem
+                    accordionItem
                     key={row.index}
                     title={`Room ${row.index}`}
-                    subtitle={formatArea(row.area)}
                     after={formatMoney(row.total)}
-                    text={`${formatMoney(row.rent)} rent · ${formatMoney(row.fee)} fees`}
-                  />
+                  >
+                    <AccordionContent>
+                      <Block inset strong>
+                        <dl className="no-margin">
+                          <dt>Area</dt>
+                          <dd>{formatArea(row.area)}</dd>
+                          <dt>Rent</dt>
+                          <dd>{formatMoney(row.rent)}</dd>
+                          <dt>Fees</dt>
+                          <dd>{formatMoney(row.fee)}</dd>
+                        </dl>
+                      </Block>
+                    </AccordionContent>
+                  </ListItem>
                 ))}
               </List>
             </>
