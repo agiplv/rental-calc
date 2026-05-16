@@ -1,6 +1,6 @@
 {
   "name": "PEA Rental Calc",
-  "short_name": "RentalCalc",
+  "short_name": "PEA Calc",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#0f172a",
