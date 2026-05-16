@@ -11,8 +11,11 @@ export function calculateRentalPrices(
   const roomsTotalArea = roomsArea.reduce((s, a) => s + a, 0);
   if (roomsTotalArea === 0) return null;
   const monthlyFeePerSqM = basementMonthlyFee / roomsTotalArea;
+  // totalCollectedBeforeTax is the total amount collected from tenants (rent + fees)
   const totalMonthlyIncomeBeforeTax = (monthlyTargetProfit + basementMonthlyFee) / (1 - tax);
-  const pricePerSqM = totalMonthlyIncomeBeforeTax / roomsTotalArea;
+  // rent portion excludes the fixed monthly fees; allocate rent across area only
+  const rentTotalBeforeTax = totalMonthlyIncomeBeforeTax - basementMonthlyFee;
+  const pricePerSqM = rentTotalBeforeTax / roomsTotalArea;
   let totalRent = 0, totalFees = 0, totalIncomeBeforeTax = 0;
   const rows = roomsArea.map((area, index) => {
     const roomRent = pricePerSqM * area;
