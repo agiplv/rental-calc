@@ -405,7 +405,6 @@ export default function Calculator() {
 
           <Tab id="tab-result">
             <PageContent>
-              <div className="margin-top margin-horizontal margin-bottom">
               {formStatusMessage && (
                 <Block strong inset className="margin-top">
                   <p className="text-color-red">{formStatusMessage}</p>
@@ -474,7 +473,6 @@ export default function Calculator() {
                   </List>
                 </>
               )}
-              </div>
             </PageContent>
           </Tab>
         </Tabs>
