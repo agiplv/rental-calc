@@ -81,6 +81,7 @@ vi.mock('framework7-react', () => {
     CardContent: wrap('div'),
     CardHeader: wrap('div'),
     Chip: ({ text }) => <span>{text}</span>,
+    Icon: ({ f7 }) => <span aria-hidden="true">{f7}</span>,
     Link: ({ children, onClick, tabLink, tabLinkActive, ...props }) => {
       const { setActiveTab } = useTabState()
       return (

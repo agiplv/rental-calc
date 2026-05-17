@@ -4,10 +4,12 @@ import {
   Block,
   BlockTitle,
   Button,
+  Icon,
   Link,
   List,
   ListInput,
   ListItem,
+  PageContent,
   SwipeoutActions,
   SwipeoutButton,
   Tab,
@@ -207,9 +209,10 @@ export default function Calculator() {
 
   return (
     <>
-      <Tabs animated swipeable>
-          <Tab id="tab-calc" tabActive className="page-content">
-            <List className="list-strong list-dividers inset-ios no-hairlines margin-top margin-horizontal margin-bottom">
+        <Tabs animated swipeable>
+          <Tab id="tab-calc" tabActive>
+            <PageContent>
+              <List className="list-strong list-dividers inset-ios no-hairlines margin-top margin-horizontal margin-bottom">
                   <ListItem accordionItem title={`Rooms${parsedRooms.length > 0 ? ` (${parsedRooms.length})` : ''}`}>
                     <AccordionContent>
                       <List className="list-strong list-dividers inset-ios no-margin-top no-margin-bottom">
@@ -240,7 +243,7 @@ export default function Calculator() {
                             disabled={!canAddRoom}
                             onClick={addRoomFromInput}
                           >
-                            <i className="icon f7-icons" style={{ marginRight: 6 }}>plus_circle_fill</i>
+                            <Icon f7="plus_circle_fill" style={{ marginRight: 6 }} />
                             <span>Add room</span>
                           </Button>
                         </ListItem>
@@ -371,10 +374,12 @@ export default function Calculator() {
                     </AccordionContent>
                   </ListItem>
                 </List>
+            </PageContent>
           </Tab>
 
-          <Tab id="tab-result" className="page-content">
-            <div className="margin-top margin-horizontal margin-bottom">
+          <Tab id="tab-result">
+            <PageContent>
+              <div className="margin-top margin-horizontal margin-bottom">
               {formStatusMessage && (
                 <Block strong inset className="margin-top">
                   <p className="text-color-red">{formStatusMessage}</p>
@@ -443,17 +448,18 @@ export default function Calculator() {
                   </List>
                 </>
               )}
-            </div>
+              </div>
+            </PageContent>
           </Tab>
         </Tabs>
 
       <Toolbar tabbar labels bottom>
         <Link tabLink={CALC_TAB} tabLinkActive>
-          <i className="icon f7-icons" aria-hidden="true">slider_horizontal_3</i>
+          <Icon f7="slider_horizontal_3" />
           <span>Calc</span>
         </Link>
         <Link tabLink={RESULT_TAB}>
-          <i className="icon f7-icons" aria-hidden="true">chart_bar_fill</i>
+          <Icon f7="chart_bar_fill" />
           <span>Result</span>
         </Link>
       </Toolbar>
