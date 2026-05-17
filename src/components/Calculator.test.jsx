@@ -175,6 +175,13 @@ describe('Calculator', () => {
 
     expect(screen.getByRole('button', { name: 'Calc' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Result' })).toBeInTheDocument()
+    expect(screen.getByText('4 rooms · 106.00 m²')).toBeInTheDocument()
+    expect(screen.getByText('250.00 € fees · 10.0% tax')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        '15.0% annual profit · 25000.00 € investment · 100.00 € min monthly profit · 0.00 size weight'
+      )
+    ).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Result' }))
     expect(screen.getByText('Summary')).toBeInTheDocument()
     expect(screen.getAllByText('Gross income').length).toBeGreaterThan(0)
