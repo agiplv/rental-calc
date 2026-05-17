@@ -243,7 +243,7 @@ export default function Calculator() {
                             disabled={!canAddRoom}
                             onClick={addRoomFromInput}
                           >
-                            <Icon f7="plus_circle_fill" />
+                            <Icon f7="plus_circle_fill" style={{ marginRight: 6 }} />
                             <span>Add room</span>
                           </Button>
                         </ListItem>
