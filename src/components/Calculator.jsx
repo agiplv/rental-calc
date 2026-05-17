@@ -390,7 +390,7 @@ export default function Calculator() {
 
               {result && (
                 <>
-                  <List dividersIos outlineIos strongIos>
+                  <List className="list-strong-ios list-dividers-ios list-outline-ios inset-ios">
                     <ListItem
                       accordionItem
                       title="Summary"
@@ -399,7 +399,7 @@ export default function Calculator() {
                       footer={`${formatMoney(result.pricePerSqM, '€/m²')} rent price`}
                     >
                       <AccordionContent>
-                        <List dividersIos outlineIos strongIos>
+                        <List className="list-strong-ios list-dividers-ios list-outline-ios inset-ios no-margin-top no-margin-bottom">
                           <ListItem title="Gross income" after={formatMoney(result.totalMonthlyIncomeBeforeTax)} />
                           <ListItem title="Net profit" after={formatMoney(result.netProfit)} />
                           <ListItem title="Target profit" after={formatMoney(result.monthlyTargetProfit)} />
@@ -415,7 +415,7 @@ export default function Calculator() {
 
                   <BlockTitle medium>Per-room breakdown</BlockTitle>
 
-                  <List dividersIos outlineIos strongIos>
+                  <List className="list-strong-ios list-dividers-ios list-outline-ios inset-ios">
                     {result.rows.map(row => {
                       const areaShare = result.roomsTotalArea > 0 ? (row.area / result.roomsTotalArea) * 100 : 0
                       const totalRatePerSqM = row.area > 0 ? row.total / row.area : null
@@ -430,7 +430,7 @@ export default function Calculator() {
                           footer={formatRate(totalRatePerSqM)}
                         >
                           <AccordionContent>
-                            <List dividersIos outlineIos strongIos>
+                            <List className="list-strong-ios list-dividers-ios list-outline-ios inset-ios no-margin-top no-margin-bottom">
                               <ListItem title="Rent portion" after={formatMoney(row.rent)} />
                               <ListItem title="Fees portion" after={formatMoney(row.fee)} />
                               <ListItem title="Rate" after={formatRate(totalRatePerSqM)} />
