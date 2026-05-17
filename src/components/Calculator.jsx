@@ -1,14 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  AccordionItem,
   AccordionContent,
-  AccordionToggle,
   Block,
   BlockTitle,
   Button,
-  Card,
-  CardContent,
-  CardHeader,
   Link,
   List,
   ListInput,
@@ -420,44 +415,32 @@ export default function Calculator() {
 
                   <BlockTitle medium>Per-room breakdown</BlockTitle>
 
-                  {result.rows.map(row => {
-                    const areaShare = result.roomsTotalArea > 0 ? (row.area / result.roomsTotalArea) * 100 : 0
-                    const totalRatePerSqM = row.area > 0 ? row.total / row.area : null
+                  <List>
+                    {result.rows.map(row => {
+                      const areaShare = result.roomsTotalArea > 0 ? (row.area / result.roomsTotalArea) * 100 : 0
+                      const totalRatePerSqM = row.area > 0 ? row.total / row.area : null
 
-                    return (
-                      <AccordionItem key={row.index}>
-                        <Card className="no-margin-bottom margin-top-half">
-                          <AccordionToggle>
-                            <CardHeader className="display-flex justify-content-space-between align-items-center no-padding-right">
-                              <div className="min-width-0" style={{ flex: 1, overflow: 'hidden' }}>
-                                <div className="font-weight-semibold">{`Room ${row.index}`}</div>
-                                <div className="text-color-gray text-small">
-                                  {`${formatArea(row.area)} · ${formatPercent(areaShare)}`}
-                                </div>
-                              </div>
-                              <div className="display-flex align-items-center" style={{ flexShrink: 0, paddingLeft: 8, paddingRight: 12 }}>
-                                <span className="text-color-black font-weight-semibold" style={{ marginRight: 4 }}>
-                                  {formatMoney(row.total)}
-                                </span>
-                                <i className="icon f7-icons text-color-gray accordion-item-toggle-icon" aria-hidden="true">chevron_down</i>
-                              </div>
-                            </CardHeader>
-                          </AccordionToggle>
+                      return (
+                        <ListItem
+                          key={row.index}
+                          accordionItem
+                          title={`Room ${row.index}`}
+                          after={formatMoney(row.total)}
+                          subtitle={`${formatArea(row.area)} · ${formatPercent(areaShare)}`}
+                          footer={formatRate(totalRatePerSqM)}
+                        >
                           <AccordionContent>
-                            <CardContent className="padding-top-half">
-                              <List>
-                                <ListItem title="Area" after={formatArea(row.area)} />
-                                <ListItem title="Rent portion" after={formatMoney(row.rent)} />
-                                <ListItem title="Fees portion" after={formatMoney(row.fee)} />
-                                <ListItem title="Rate" after={formatRate(totalRatePerSqM)} />
-                                <ListItem title="Share of total area" after={formatPercent(areaShare)} />
-                              </List>
-                            </CardContent>
+                            <List>
+                              <ListItem title="Rent portion" after={formatMoney(row.rent)} />
+                              <ListItem title="Fees portion" after={formatMoney(row.fee)} />
+                              <ListItem title="Rate" after={formatRate(totalRatePerSqM)} />
+                              <ListItem title="Share of total area" after={formatPercent(areaShare)} />
+                            </List>
                           </AccordionContent>
-                        </Card>
-                      </AccordionItem>
-                    )
-                  })}
+                        </ListItem>
+                      )
+                    })}
+                  </List>
                 </>
               )}
             </div>
