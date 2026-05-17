@@ -108,7 +108,29 @@ export default function Calculator() {
     () => parsedRooms.reduce((sum, area) => sum + area, 0),
     [parsedRooms]
   )
+  const monthlyFeeValue = useMemo(() => toNumber(monthlyFee, DEFAULTS.monthlyFee), [monthlyFee])
+  const taxValue = useMemo(() => toNumber(tax, DEFAULTS.tax), [tax])
+  const profitValue = useMemo(() => toNumber(profit, DEFAULTS.profit), [profit])
+  const investmentValue = useMemo(() => toNumber(investment, DEFAULTS.investment), [investment])
+  const minProfitValue = useMemo(() => toNumber(minProfit, DEFAULTS.minProfit), [minProfit])
+  const sizeWeightValue = useMemo(() => toNumber(sizeWeight, DEFAULTS.sizeWeight), [sizeWeight])
   const canAddRoom = useMemo(() => parseNewRoomValue(newRoomText) !== null, [newRoomText])
+  const roomsSectionFooter = useMemo(
+    () =>
+      parsedRooms.length > 0
+        ? `${parsedRooms.length} rooms · ${formatArea(roomsTotalArea)}`
+        : 'No rooms selected',
+    [parsedRooms, roomsTotalArea]
+  )
+  const costsSectionFooter = useMemo(
+    () => `${formatMoney(monthlyFeeValue)} fees · ${formatPercent(taxValue)} tax`,
+    [monthlyFeeValue, taxValue]
+  )
+  const profitSectionFooter = useMemo(
+    () =>
+      `${formatPercent(profitValue)} annual profit · ${formatMoney(investmentValue)} investment · ${formatMoney(minProfitValue)} min monthly profit · ${sizeWeightValue.toFixed(2)} size weight`,
+    [profitValue, investmentValue, minProfitValue, sizeWeightValue]
+  )
   const formStatusMessage = roomsError || validationError
 
   useEffect(() => {
@@ -213,7 +235,11 @@ export default function Calculator() {
           <Tab id="tab-calc" tabActive>
             <PageContent>
               <List strong dividers insetIos noHairlines className="margin-top margin-horizontal margin-bottom">
-                  <ListItem accordionItem title={`Rooms${parsedRooms.length > 0 ? ` (${parsedRooms.length})` : ''}`}>
+                   <ListItem
+                     accordionItem
+                     title={`Rooms${parsedRooms.length > 0 ? ` (${parsedRooms.length})` : ''}`}
+                     footer={roomsSectionFooter}
+                   >
                     <AccordionContent>
                       <List strong dividers insetIos className="no-margin-top no-margin-bottom">
                         <ListInput
@@ -290,7 +316,7 @@ export default function Calculator() {
                       )}
                     </AccordionContent>
                   </ListItem>
-                  <ListItem accordionItem title="Costs and taxes">
+                   <ListItem accordionItem title="Costs and taxes" footer={costsSectionFooter}>
                     <AccordionContent>
                       <List strong dividers insetIos className="no-margin-top no-margin-bottom">
                         <ListInput
@@ -320,7 +346,7 @@ export default function Calculator() {
                       </List>
                     </AccordionContent>
                   </ListItem>
-                  <ListItem accordionItem title="Profit targets">
+                   <ListItem accordionItem title="Profit targets" footer={profitSectionFooter}>
                     <AccordionContent>
                       <List strong dividers insetIos className="no-margin-top no-margin-bottom">
                         <ListInput
@@ -395,7 +421,7 @@ export default function Calculator() {
 
               {result && (
                 <>
-                  <List strongIos dividersIos outlineIos insetIos>
+                  <List strongIos dividersIos insetIos>
                     <ListItem
                       accordionItem
                       title="Summary"
@@ -404,7 +430,7 @@ export default function Calculator() {
                       footer={`${formatMoney(result.pricePerSqM, '€/m²')} rent price`}
                     >
                       <AccordionContent>
-                        <List strongIos dividersIos outlineIos insetIos className="no-margin-top no-margin-bottom">
+                        <List strongIos dividersIos insetIos className="no-margin-top no-margin-bottom">
                           <ListItem title="Gross income" after={formatMoney(result.totalMonthlyIncomeBeforeTax)} />
                           <ListItem title="Net profit" after={formatMoney(result.netProfit)} />
                           <ListItem title="Target profit" after={formatMoney(result.monthlyTargetProfit)} />
@@ -420,7 +446,7 @@ export default function Calculator() {
 
                   <BlockTitle medium>Per-room breakdown</BlockTitle>
 
-                  <List strongIos dividersIos outlineIos insetIos>
+                  <List strongIos dividersIos insetIos>
                     {result.rows.map(row => {
                       const areaShare = result.roomsTotalArea > 0 ? (row.area / result.roomsTotalArea) * 100 : 0
                       const totalRatePerSqM = row.area > 0 ? row.total / row.area : null
@@ -435,7 +461,7 @@ export default function Calculator() {
                           footer={formatRate(totalRatePerSqM)}
                         >
                           <AccordionContent>
-                            <List strongIos dividersIos outlineIos insetIos className="no-margin-top no-margin-bottom">
+                            <List strongIos dividersIos insetIos className="no-margin-top no-margin-bottom">
                               <ListItem title="Rent portion" after={formatMoney(row.rent)} />
                               <ListItem title="Fees portion" after={formatMoney(row.fee)} />
                               <ListItem title="Rate" after={formatRate(totalRatePerSqM)} />
